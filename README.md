@@ -35,6 +35,31 @@ The application leverages a robust relational PostgreSQL database comprising 7 c
 4. **`page`**: A one-to-many child of `chapter`. Stores the exact file paths/URLs of the panels or pages. It enforces a unique constraint on `(chapter_id, page_number)` so the reader's progression is identically ordered as published.
 5. **`reading_progress`**: A junction mapping table bridging a `reader_id` to a `chapter_id`. It dynamically increments and saves the `last_page` integer a user was currently viewing and flags `completed=True` when they reach the end for accurate bookmarks.
 
+## 📁 Project Folder Structure
+
+A well-organized directory structure separates concerns and keeps the application scalable:
+
+```text
+Comic_Book_Reading_Platform/
+├── app/                  # Main application package
+│   ├── queries/          # SQL queries and database interaction functions
+│   ├── routes/           # Flask blueprint routing and controllers
+│   ├── services/         # Business logic and complex operations
+│   ├── static/           # Static assets like CSS, JS, and logos
+│   ├── templates/        # HTML templates for rendering views
+│   ├── utils/            # Helper functions and utilities
+│   ├── screenshot/       # Contains screenshots for documentation
+│   ├── db.py             # Database connection setup
+│   └── __init__.py       # Application factory and initialization
+├── Data/                 # File storage
+│   └── comics/           # Uploaded comic pages and covers
+├── docs/                 # Documentation and database schema SQL
+├── insert_admin.py       # Helper script to create an initial admin
+├── pyproject.toml        # Project definitions and dependencies
+├── run.py                # Waitress/development server runner
+└── main.py               # Application entry point alternative
+```
+
 ## 📸 Screenshots
 
 *(Images are stored in the `app/screenshot/` directory)*

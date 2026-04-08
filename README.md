@@ -25,6 +25,16 @@ The platform supports three distinct user roles:
 - **Environment Management**: `python-dotenv`
 - **Package Management**: `uv` / `pip`
 
+## 🗄️ Database Architecture & Schema Explanation
+
+The application leverages a robust relational PostgreSQL database comprising 7 core tables:
+
+1. **`admin` / `publisher` / `reader`**: These three tables separately handle user identities, credentials, and roles. Splitting them avoids monolithic "users" tables and strictly enforces role-based responsibilities dynamically via separate foreign key bindings.
+2. **`comic`**: The central entity representing a publication. It is directly linked to a `publisher_id` (Foreign Key) to establish ownership. It natively tracks its publication state via a custom ENUM `comic_status` ('draft' or 'published').
+3. **`chapter`**: A one-to-many child of the `comic` table. It strictly enforces a unique constraint on `(comic_id, chapter_number)` to prevent a publisher from accidentally generating duplicate chapters (e.g., two "Chapter 1"s in the same comic).
+4. **`page`**: A one-to-many child of `chapter`. Stores the exact file paths/URLs of the panels or pages. It enforces a unique constraint on `(chapter_id, page_number)` so the reader's progression is identically ordered as published.
+5. **`reading_progress`**: A junction mapping table bridging a `reader_id` to a `chapter_id`. It dynamically increments and saves the `last_page` integer a user was currently viewing and flags `completed=True` when they reach the end for accurate bookmarks.
+
 ## 📸 Screenshots
 
 *(Images are stored in the `app/screenshot/` directory)*

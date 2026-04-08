@@ -1,0 +1,121 @@
+<!-- templates/publisher_home.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Publisher</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <!-- Top Bar -->
+    <header class="dashboard-header">
+        <div class="header-left">
+            {% if user_logo %}
+            <img src="/data/{{ user_logo }}" alt="{{ user_name }} logo" class="publisher-logo-small">
+            {% endif %}
+            <h1>CBRP</h1>
+        </div>
+        <div class="header-right">
+            <span>{{ user_name }}</span>
+            <a href="/logout" class="btn-logout">Logout</a>
+        </div>
+    </header>
+
+    <!-- Page Title -->
+    <div class="page-title">
+        <h2>Your Comics</h2>
+        <p>Manage your comic catalog</p>
+    </div>
+
+    <!-- Create New Comic Form -->
+    <div class="create-form-card">
+        <h3>Publish New Comic</h3>
+        <form method="POST" action="/publisher/create" enctype="multipart/form-data">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" name="title" id="title" placeholder="Comic title" required>
+                </div>
+                <div class="form-group">
+                    <label for="genre">Genre</label>
+                    <input type="text" name="genre" id="genre" placeholder="e.g. Action, Sci-Fi">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <input type="text" name="description" id="description" placeholder="Short description">
+            </div>
+            <div class="form-group">
+                <label for="poster">Poster Image</label>
+                <input type="file" name="poster" id="poster" accept="image/*" class="file-input">
+            </div>
+            <button type="submit" class="btn-primary">+ Create Comic</button>
+        </form>
+    </div>
+
+    <!-- Comics Table -->
+    {% if comics %}
+    <div class="comics-table-wrapper">
+        <table class="comics-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Genre</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comic in comics %}
+                <tr>
+                    <td>
+                        <strong>{{ comic.title }}</strong>
+                        {% if comic.description %}
+                        <br><small>{{ comic.description[:50] }}{% if comic.description|length > 50 %}…{% endif %}</small>
+                        {% endif %}
+                    </td>
+                    <td>{{ comic.genre or '—' }}</td>
+                    <td>
+                        <span class="status-badge status-{{ comic.status }}">{{ comic.status | upper }}</span>
+                    </td>
+                    <td>{{ comic.created_at.strftime('%b %d, %Y') if comic.created_at else '—' }}</td>
+                    <td class="actions-cell">
+                        <!-- Quick Status Toggle -->
+                        <form method="POST" action="/publisher/edit/{{ comic.id }}" style="display:inline;">
+                            <input type="hidden" name="title" value="{{ comic.title }}">
+                            {% if comic.status == 'draft' %}
+                                <input type="hidden" name="status" value="published">
+                                <button type="submit" class="btn-small btn-success" style="border-color: #22c55e; color: #166534;">Publish</button>
+                            {% else %}
+                                <input type="hidden" name="status" value="draft">
+                                <button type="submit" class="btn-small">Unpublish</button>
+                            {% endif %}
+                        </form>
+                        
+                        <a href="/publisher/comic/{{ comic.id }}/chapters" class="btn-small">Chapters</a>
+                        <a href="/publisher/edit/{{ comic.id }}" class="btn-small">Edit</a>
+                        <form method="POST" action="/publisher/delete/{{ comic.id }}" style="display:inline;"
+                              onsubmit="return confirm('Delete this comic permanently?');">
+                            <button type="submit" class="btn-small btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>You haven't created any comics yet.</p>
+        <p>Use the form above to get started!</p>
+    </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

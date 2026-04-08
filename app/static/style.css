@@ -1,0 +1,686 @@
+/* static/style.css */
+
+:root {
+    --brutalist-black: #000000;
+    --brutalist-white: #ffffff;
+    --brutalist-gray: #666666;
+    --brutalist-hover: #333333;
+    --brutalist-blue: #0000ee; /* Retro Blue for links */
+}
+
+body {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: var(--brutalist-white);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+    color: var(--brutalist-black);
+    overflow-x: hidden;
+}
+
+/* Base wrapper to center everything cleanly */
+.layout-wrapper {
+    display: flex;
+    flex-direction: column; /* Centered column layout */
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Illustration Box: Ensures consistent visibility */
+.illustration-box {
+    display: block !important;
+    text-align: center;
+}
+
+.illustration-box img {
+    width: 160px; /* Small decorative size */
+    height: auto;
+    display: inline-block;
+}
+
+.auth-card {
+    background: var(--brutalist-white);
+    padding: 35px;
+    width: 100%;
+    max-width: 420px;
+    border: 4px solid var(--brutalist-black);
+    border-radius: 12px;
+    box-sizing: border-box;
+    box-shadow: 8px 8px 0px rgba(0,0,0,0.1);
+}
+
+.brand-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.brand-header h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.brand-header p {
+    font-size: 0.85rem;
+    color: var(--brutalist-gray);
+    margin-top: 5px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--brutalist-black);
+    border-radius: 6px;
+    background: var(--brutalist-white);
+    color: var(--brutalist-black);
+    font-family: inherit;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: all 0.2s ease-in-out;
+}
+
+input:focus, select:focus {
+    outline: none;
+    background: #fdfdfd;
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.05);
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--brutalist-black);
+    color: var(--brutalist-white);
+    font-family: inherit;
+    font-weight: bold;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.btn-primary:hover {
+    background-color: var(--brutalist-hover);
+    transform: translateY(-1px);
+}
+
+.footer-links {
+    margin-top: 25px;
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+.footer-links a {
+    color: var(--brutalist-blue);
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.project-description {
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px dashed var(--brutalist-black);
+    text-align: center;
+    font-size: 0.8rem;
+    color: #555;
+    line-height: 1.4;
+}
+
+/* Mobile Media Queries */
+@media (max-width: 480px) {
+    body {
+        padding: 50px 15px;
+        align-items: flex-start; /* Start from top to support scrolling cards */
+        overflow-y: auto;
+    }
+
+    .layout-wrapper {
+        margin: 0 auto;
+        gap: 20px;
+    }
+    
+    .auth-card {
+        border-width: 3px;
+        padding: 24px 20px;
+    }
+    
+    .illustration-box img {
+        width: 120px; /* Force visibility and center */
+    }
+}
+
+
+/* ==============================================
+   DASHBOARD STYLES (Reader Home / Publisher Home)
+   ============================================== */
+
+.dashboard-wrapper {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--brutalist-black);
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.publisher-logo-small {
+    width: 38px;
+    height: 38px;
+    border: 2px solid var(--brutalist-black);
+    border-radius: 6px;
+    object-fit: cover;
+    background: #fff;
+}
+
+.dashboard-header h1 {
+    font-size: 1.6rem;
+    font-weight: bold;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 0.9rem;
+}
+
+.btn-logout {
+    color: var(--brutalist-black);
+    text-decoration: none;
+    border: 2px solid var(--brutalist-black);
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.btn-logout:hover {
+    background: var(--brutalist-black);
+    color: var(--brutalist-white);
+}
+
+.page-title {
+    margin-bottom: 30px;
+}
+
+.page-title h2 {
+    font-size: 1.8rem;
+    margin: 0 0 5px 0;
+    text-transform: uppercase;
+}
+
+.page-title p {
+    margin: 0;
+    color: var(--brutalist-gray);
+    font-size: 0.9rem;
+}
+
+.page-title a {
+    color: var(--brutalist-blue);
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.comics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 25px;
+}
+
+.comic-card {
+    border: 2px solid var(--brutalist-black);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.1s;
+}
+
+.comic-card:hover {
+    box-shadow: 6px 6px 0px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.comic-poster {
+    width: 100%;
+    height: 260px;
+    background: #f0f0f0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.comic-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.comic-poster-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: #e0e0e0;
+    font-size: 3rem;
+    font-weight: bold;
+    color: #aaa;
+}
+
+.comic-info {
+    padding: 15px;
+}
+
+.comic-title {
+    font-size: 1rem;
+    margin: 0 0 5px 0;
+    font-weight: bold;
+}
+
+.comic-meta {
+    font-size: 0.8rem;
+    color: var(--brutalist-gray);
+    margin: 0 0 8px 0;
+}
+
+.comic-genre {
+    display: inline-block;
+    font-size: 0.75rem;
+    border: 1px solid var(--brutalist-black);
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-bottom: 8px;
+}
+
+.comic-desc {
+    font-size: 0.8rem;
+    color: #555;
+    margin: 8px 0 0 0;
+    line-height: 1.4;
+}
+
+.create-form-card {
+    border: 2px solid var(--brutalist-black);
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.create-form-card h3 {
+    font-size: 1.2rem;
+    margin: 0 0 20px 0;
+    text-transform: uppercase;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.comics-table-wrapper {
+    overflow-x: auto;
+}
+
+.comics-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 2px solid var(--brutalist-black);
+}
+
+.comics-table th,
+.comics-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: 0.9rem;
+}
+
+.comics-table th {
+    background: var(--brutalist-black);
+    color: var(--brutalist-white);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+}
+
+.comics-table tbody tr:hover {
+    background: #f9f9f9;
+}
+
+.comics-table small {
+    color: var(--brutalist-gray);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.status-draft {
+    background: #f5f5f5;
+    border: 1px solid #ccc;
+    color: #666;
+}
+
+.status-published {
+    background: #000;
+    color: #fff;
+}
+
+.actions-cell {
+    white-space: nowrap;
+}
+
+.btn-small {
+    display: inline-block;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    font-family: inherit;
+    font-weight: bold;
+    border: 2px solid var(--brutalist-black);
+    background: var(--brutalist-white);
+    color: var(--brutalist-black);
+    text-decoration: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-right: 5px;
+}
+
+.btn-small:hover {
+    background: var(--brutalist-black);
+    color: var(--brutalist-white);
+}
+
+.btn-danger {
+    border-color: #dc2626;
+    color: #dc2626;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    color: var(--brutalist-white);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    color: var(--brutalist-gray);
+}
+
+.error-box {
+    margin-bottom: 20px;
+    padding: 12px;
+    background-color: #fee2e2;
+    border: 2px solid #ef4444;
+    color: #b91c1c;
+    font-weight: bold;
+    border-radius: 6px;
+    text-align: center;
+}
+
+/* --- Dashboard Responsive --- */
+@media (max-width: 768px) {
+    .dashboard-wrapper {
+        padding: 15px;
+    }
+
+    .comics-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 15px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .comics-table th,
+    .comics-table td {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-header h1 {
+        font-size: 1.2rem;
+    }
+
+    .comics-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .comic-poster {
+        height: 180px;
+    }
+}
+
+
+/* ==============================================
+   FILE UPLOAD STYLES
+   ============================================== */
+
+.file-input {
+    width: 100%;
+    padding: 10px;
+    border: 2px dashed var(--brutalist-black);
+    border-radius: 6px;
+    background: #fafafa;
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.file-input:hover {
+    background: #f0f0f0;
+}
+
+.poster-preview {
+    margin-bottom: 10px;
+}
+
+.preview-img {
+    max-width: 120px;
+    max-height: 160px;
+    border: 2px solid var(--brutalist-black);
+    border-radius: 4px;
+    object-fit: cover;
+    display: block;
+    margin-bottom: 5px;
+}
+
+
+/* ==============================================
+   CHAPTER MANAGEMENT
+   ============================================== */
+
+.chapter-card {
+    border: 2px solid var(--brutalist-black);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.chapter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.page-count {
+    font-size: 0.8rem;
+    color: var(--brutalist-gray);
+    margin-left: 10px;
+}
+
+.upload-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.upload-form .file-input {
+    flex: 1;
+    padding: 8px;
+}
+
+.file-input-label {
+    flex: 1;
+}
+
+.pages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+}
+
+.page-thumb {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+    text-align: center;
+}
+
+.page-thumb img {
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+    display: block;
+}
+
+.page-thumb span {
+    display: block;
+    font-size: 0.7rem;
+    padding: 4px;
+    background: #f5f5f5;
+    color: var(--brutalist-gray);
+}
+
+
+/* ==============================================
+   COMIC READER
+   ============================================== */
+
+.reader-view {
+    max-width: 800px;
+}
+
+.chapter-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 25px;
+}
+
+.bottom-nav {
+    margin-top: 30px;
+    justify-content: space-between;
+}
+
+.btn-active {
+    background: var(--brutalist-black) !important;
+    color: var(--brutalist-white) !important;
+}
+
+.reader-pages {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.reader-page {
+    width: 100%;
+    max-width: 700px;
+}
+
+.reader-page img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid #eee;
+}
+
+.comic-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.comic-card-link:hover .comic-card {
+    box-shadow: 6px 6px 0px rgba(0,0,0,0.15);
+    transform: translateY(-3px);
+}
+
+/* Reader responsive */
+@media (max-width: 480px) {
+    .chapter-nav {
+        gap: 5px;
+    }
+
+    .chapter-nav .btn-small {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+    }
+
+    .pages-grid {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    }
+}

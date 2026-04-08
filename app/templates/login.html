@@ -1,0 +1,70 @@
+<!-- templates/login.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Comic Reader</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="layout-wrapper">
+    <!-- Branding Illustration -->
+    <div class="illustration-box">
+        <img src="/static/background/comic_reader_illustration_.png" alt="Illustration of a person reading a comic book">
+    </div>
+
+    <!-- Login Card -->
+    <div class="auth-card">
+        <div class="brand-header">
+            <h1>CBRP</h1>
+            <p>Comic Book Reading Platform</p>
+        </div>
+
+        {% if error %}
+        <div class="error-box" role="alert">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="/login">
+            <div class="form-group">
+                <label for="role">Role</label>
+                <select name="role" id="role">
+                    <option value="admin">Admin</option>
+                    <option value="publisher">Publisher</option>
+                    <option value="reader">Reader</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" placeholder="email@example.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn-primary">Login</button>
+        </form>
+
+        <div class="footer-links">
+            <p>New reader? <a href="/register">Register here</a></p>
+        </div>
+
+        <!-- Project Footer (Moved inside) -->
+        <div class="project-description">
+            <p>
+                This is the Comic Book Reading Platform developed for educational purposes. 
+                Explore a vast library of digital comics and manage your collections with ease.
+            </p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

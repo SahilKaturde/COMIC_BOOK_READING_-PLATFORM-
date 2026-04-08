@@ -1,0 +1,40 @@
+<!-- templates/reader_no_content.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ comic.title }} — No Content | Comic Reader</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <!-- Top Bar -->
+    <header class="dashboard-header">
+        <h1>CBRP</h1>
+        <div class="header-right">
+            <span>{{ user_name }}</span>
+            <a href="/logout" class="btn-logout">Logout</a>
+        </div>
+    </header>
+
+    <!-- Comic Info -->
+    <div class="page-title">
+        <h2>{{ comic.title }}</h2>
+        <p>No chapters available yet · <a href="/reader_home">&larr; Back to Library</a></p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" style="padding: 100px 30px;">
+        <h3>Coming Soon!</h3>
+        <p>The publisher hasn't uploaded any chapters or pages for this comic yet.</p>
+        <p>Check back later to see the latest updates.</p>
+        <br>
+        <a href="/reader_home" class="btn-primary" style="max-width: 200px; display: inline-block; text-decoration:none;">Library Home</a>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!-- templates/register.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Comic Reader</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="layout-wrapper">
+    <!-- Branding Illustration -->
+    <div class="illustration-box">
+        <img src="/static/background/comic_reader_illustration_.png" alt="Illustration of a person reading a comic book">
+    </div>
+
+    <!-- Register Card -->
+    <div class="auth-card">
+        <div class="brand-header">
+            <h1>CBRP</h1>
+            <p>Comic Book Reading Platform</p>
+        </div>
+
+        {% if error %}
+        <div class="error-box" role="alert">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="/register" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="role">Role</label>
+                <select name="role" id="role">
+                    <option value="admin">Admin</option>
+                    <option value="publisher">Publisher</option>
+                    <option value="reader" selected>Reader</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" name="name" id="name" placeholder="Enter your name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" placeholder="email@example.com" required>
+            </div>
+
+            <div class="form-group" id="logo-group" style="display: none;">
+                <label for="logo">Logo / Image</label>
+                <input type="file" name="logo" id="logo" accept="image/*" class="file-input">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn-primary">Create Account</button>
+        </form>
+
+        <div class="footer-links">
+            <p>Already a reader? <a href="/login">Login here</a></p>
+        </div>
+
+        <div class="project-description">
+            <p>
+                This is the Comic Book Reading Platform developed for educational purposes. 
+                Explore a vast library of digital comics and manage your collections with ease.
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const roleSelect = document.getElementById('role');
+    const logoGroup = document.getElementById('logo-group');
+    
+    function toggleLogoField() {
+        logoGroup.style.display = roleSelect.value === 'publisher' ? 'block' : 'none';
+    }
+    
+    roleSelect.addEventListener('change', toggleLogoField);
+    toggleLogoField();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!-- templates/reader_comic.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ comic.title }} — Ch. {{ chapter.chapter_number }} | Comic Reader</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="dashboard-wrapper reader-view">
+    <!-- Top Bar -->
+    <header class="dashboard-header">
+        <h1>CBRP</h1>
+        <div class="header-right">
+            <span>{{ user_name }}</span>
+            <a href="/logout" class="btn-logout">Logout</a>
+        </div>
+    </header>
+
+    <!-- Comic & Chapter Info -->
+    <div class="page-title">
+        <h2>{{ comic.title }}</h2>
+        <p>
+            Chapter {{ chapter.chapter_number }}{% if chapter.title %} — {{ chapter.title }}{% endif %}
+            · <a href="/reader_home">&larr; Back to Library</a>
+        </p>
+    </div>
+
+    <!-- Chapter Navigation (Top) -->
+    <div class="chapter-nav">
+        {% for ch in chapters %}
+        <a href="/read/{{ comic.id }}/{{ ch.chapter_number }}"
+           class="btn-small {% if ch.chapter_number == chapter.chapter_number %}btn-active{% endif %}">
+            Ch. {{ ch.chapter_number }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Pages -->
+    {% if pages %}
+    <div class="reader-pages">
+        {% for page in pages %}
+        <div class="reader-page">
+            <img src="/data/{{ page.image_url }}" alt="Page {{ page.page_number }}" loading="lazy">
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>No pages in this chapter yet.</p>
+    </div>
+    {% endif %}
+
+    <!-- Chapter Navigation (Bottom) -->
+    <div class="chapter-nav bottom-nav">
+        {% set prev_ch = chapter.chapter_number - 1 %}
+        {% set next_ch = chapter.chapter_number + 1 %}
+        
+        {% set has_prev = false %}
+        {% set has_next = false %}
+        {% for ch in chapters %}
+            {% if ch.chapter_number == prev_ch %}{% set has_prev = true %}{% endif %}
+            {% if ch.chapter_number == next_ch %}{% set has_next = true %}{% endif %}
+        {% endfor %}
+
+        {% if has_prev %}
+        <a href="/read/{{ comic.id }}/{{ prev_ch }}" class="btn-primary" style="max-width: 200px;">&larr; Previous</a>
+        {% else %}
+        <span></span>
+        {% endif %}
+
+        {% if has_next %}
+        <a href="/read/{{ comic.id }}/{{ next_ch }}" class="btn-primary" style="max-width: 200px; text-decoration:none; text-align:center;">Next &rarr;</a>
+        {% else %}
+        <a href="/reader_home" class="btn-primary" style="max-width: 200px; text-decoration:none; text-align:center;">Back to Library</a>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

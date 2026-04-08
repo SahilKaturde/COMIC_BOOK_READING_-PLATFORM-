@@ -1,0 +1,184 @@
+<!-- templates/info.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Info | Comic Reader</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .info-container {
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            padding: 40px 20px;
+            align-items: center;
+        }
+
+        .info-card {
+            background: var(--brutalist-white);
+            border: 4px solid var(--brutalist-black);
+            padding: 40px;
+            border-radius: 0; /* Sharp brutalist edges */
+            box-shadow: 12px 12px 0px var(--brutalist-black);
+            width: 100%;
+            text-align: center;
+        }
+
+        .academic-badge {
+            display: inline-block;
+            background: var(--brutalist-black);
+            color: var(--brutalist-white);
+            padding: 8px 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+        }
+
+        .university-title {
+            font-size: 2.2rem;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            line-height: 1.1;
+        }
+
+        .course-info {
+            font-size: 1.1rem;
+            color: var(--brutalist-gray);
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--brutalist-black);
+            padding-bottom: 20px;
+        }
+
+        .illustration-gallery {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin: 40px 0;
+        }
+
+        .illustration-gallery img {
+            width: 120px;
+            height: 120px;
+            object-fit: contain; /* Ensures images fit without distortion */
+            filter: grayscale(1);
+        }
+
+        .project-meta {
+            text-align: left;
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid var(--brutalist-black);
+            background: #f9f9f9;
+        }
+
+        .meta-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .meta-item:last-child {
+            border-bottom: none;
+        }
+
+        .meta-label {
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .author-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 4px solid var(--brutalist-black);
+        }
+
+        .author-section h4 {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+
+        .author-names {
+            font-size: 1.8rem;
+            font-weight: 900;
+            line-height: 1.4;
+        }
+
+        .btn-home-link {
+            margin-top: 20px;
+            display: inline-block;
+            padding: 15px 40px;
+            background: var(--brutalist-black);
+            color: var(--brutalist-white);
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .btn-home-link:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 8px 8px 0px var(--brutalist-blue);
+        }
+
+        @media (max-width: 600px) {
+            .university-title { font-size: 1.5rem; }
+            .author-names { font-size: 1.3rem; }
+            .illustration-gallery { gap: 20px; }
+            .illustration-gallery img { width: 80px; height: 80px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="info-container">
+    <div class="academic-badge">Academic Project Documentation</div>
+
+    <div class="info-card">
+        <div class="illustration-gallery">
+            <img src="/static/background/sppu.png" alt="SPPU Logo">
+            <img src="/static/background/pvg.png" alt="PVG Logo">
+        </div>
+
+        <h2 class="university-title">Savitribai Phule Pune University</h2>
+        <div class="course-info">SPPU - Excellence in Higher Education</div>
+
+        <div class="project-meta">
+            <div class="meta-item">
+                <span class="meta-label">Project</span>
+                <span>Mini Project for SEM 2</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Course</span>
+                <span>SYBSC Computer Science</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Term</span>
+                <span>Semester IV (2025-2026)</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Platform</span>
+                <span>Comic Book Reading System</span>
+            </div>
+        </div>
+
+        <div class="author-section">
+            <h4>Developed By</h4>
+            <div class="author-names">
+                SAHIL KATURDE<br>
+                ANUJ RAJPUTH
+            </div>
+        </div>
+    </div>
+
+    <a href="/" class="btn-home-link">Enter Platform &rarr;</a>
+</div>
+
+</body>
+</html>

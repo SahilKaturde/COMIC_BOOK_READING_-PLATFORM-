@@ -1,149 +1,456 @@
-# Comic Book Reading Platform
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/Flask-3.1-000000?style=for-the-badge&logo=flask&logoColor=white" />
+  <img src="https://img.shields.io/badge/PostgreSQL-16+-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" />
+  <img src="https://img.shields.io/badge/Pillow-12.1-EE4C2C?style=for-the-badge&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/License-Academic-green?style=for-the-badge" />
+</p>
 
-A detailed web application for reading, publishing, and managing comic books online. Built with Flask and PostgreSQL.
+<h1 align="center">📚 Comic Book Reading Platform</h1>
+
+<p align="center">
+  <b>A full-stack web application for reading, publishing, and managing comic books online.</b><br/>
+  Built with <b>Python Flask</b> and <b>PostgreSQL</b> — featuring role-based dashboards, chapter-by-chapter reading, image uploads, and an admin moderation panel.
+</p>
+
+---
+
+## 📋 Table of Contents
+
+- [Features & User Roles](#-features--user-roles)
+- [Technologies Used](#️-technologies-used)
+- [Application Architecture](#️-application-architecture)
+- [Database Schema (A to Z)](#️-database-architecture--schema-explanation-a-to-z)
+- [Entity Relationship Diagram](#-entity-relationship-diagram-erd)
+- [Project Folder Structure](#-project-folder-structure)
+- [File-by-File Explanation](#-file-by-file-explanation)
+- [Screenshots](#-screenshots)
+- [How to Run Locally](#️-how-to-run-locally)
+- [Default Credentials](#-default-credentials)
+- [Environment Variables](#-environment-variables)
+- [API Endpoints Reference](#-api-endpoints-reference)
+- [Application Workflow](#-application-workflow)
+
+---
 
 ## 🚀 Features & User Roles
 
-The platform supports three distinct user roles:
+The platform supports **three distinct user roles**, each with a dedicated dashboard and permission set:
 
-1. **Reader**: 
-   - Browse and discover published comics.
-   - Read comics chapter by chapter.
-2. **Publisher**: 
-   - Create new comic titles.
-   - Upload covers and add multiple chapters.
-   - Delete/Edit their own content.
-3. **Admin**:
-   - Oversee the entire catalog of comics.
-   - Delete inappropriate or problematic comics platform-wide.
+| Role | Icon | Capabilities |
+|------|------|-------------|
+| **Reader** | 👤 | Browse published comics · Read chapters page-by-page · Track reading progress · Bookmark last-read page |
+| **Publisher** | ✍️ | Create new comic titles · Upload cover posters · Add/delete chapters · Upload page images · Edit comic metadata · Manage own catalog |
+| **Admin** | 🛡️ | View platform-wide comic catalog · Delete any comic for moderation · Oversee all publishers and content |
+
+### ✨ Key Highlights
+- 🎨 **Brutalist Minimalist UI** — Clean, bold design with custom CSS
+- 📱 **Responsive Design** — Works across desktop and mobile browsers
+- 📖 **Chapter-by-Chapter Reader** — Sequential page viewing with progress tracking
+- 🔒 **Role-Based Access Control** — Session-based authentication with strict role separation
+- 🖼️ **Image Upload Pipeline** — Multi-format support (PNG, JPG, JPEG, WebP, GIF, JFIF) with 16MB max upload
+- ⚡ **Quick Publish Workflow** — Publishers can create, upload, and publish comics in minutes
+- 🗑️ **Cascade Deletion** — Deleting a comic automatically removes all chapters, pages, and files
+
+---
 
 ## 🛠️ Technologies Used
 
-- **Backend**: Python, Flask
-- **Database**: PostgreSQL (`psycopg` v3)
-- **Image Processing**: Pillow (PIL)
-- **Environment Management**: `python-dotenv`
-- **Package Management**: `uv` / `pip`
+| Layer | Technology | Version | Purpose |
+|-------|-----------|---------|---------|
+| **Language** | Python | 3.12+ | Core backend language |
+| **Web Framework** | Flask | 3.1.3 | HTTP routing, templating, sessions |
+| **Database** | PostgreSQL | 16+ | Relational data storage |
+| **DB Driver** | psycopg | 3.3.3 (v3) | Modern async-capable PostgreSQL adapter |
+| **Templating** | Jinja2 | 3.1.6 | Server-side HTML rendering |
+| **Image Processing** | Pillow (PIL) | 12.1.1 | Image validation and processing |
+| **Env Management** | python-dotenv | 1.2.2 | `.env` file loading |
+| **WSGI Server** | Werkzeug | 3.1.7 | Development HTTP server |
+| **Package Manager** | uv / pip | Latest | Dependency resolution |
 
-## 🗄️ Database Architecture & Schema Explanation (A to Z Details)
+---
 
-The application leverages a robust relational PostgreSQL database comprising 7 core tables. Below is the complete "biodata" and relationship mapping for every entity in the system, detailing all types, constraints, defaults, and architectural decisions.
+## 🏗️ Application Architecture
 
-### 1. `admin` (System Administrators)
-* **Purpose:** Stores credentials for superusers who manage the platform.
-* **Columns:**
-  * `id` (BIGINT, Primary Key): Auto-incrementing unique identifier.
-  * `name` (VARCHAR 100): Administrator's full name.
-  * `email` (VARCHAR 150, UNIQUE): Login email, guaranteed unique.
-  * `password` (TEXT): Hashed access credential.
-  * `created_at` (TIMESTAMPTZ): Automatically records creation time.
+The application follows a **layered MVC-style architecture** with clear separation of concerns:
 
-### 2. `publisher` (Content Creators)
-* **Purpose:** Represents users authorized to create and upload comic books.
-* **Columns:**
-  * `id` (BIGINT, Primary Key): Auto-incrementing unique identifier.
-  * `name` (VARCHAR 100): Publisher's display name or studio name.
-  * `email` (VARCHAR 150, UNIQUE): Login email.
-  * `password` (TEXT): Hashed access credential.
-  * `logo_url` (TEXT): Optional path to the publisher's avatar/logo.
-  * `created_at` (TIMESTAMPTZ): Account creation timestamp.
-* **Relationships:**
-  * **One-to-Many** with `comic` (A publisher can own many comics).
+```
+┌─────────────────────────────────────────────────────────┐
+│                    CLIENT (Browser)                     │
+│              HTML Pages + CSS + JavaScript               │
+└────────────────────────┬────────────────────────────────┘
+                         │ HTTP Requests
+                         ▼
+┌─────────────────────────────────────────────────────────┐
+│                  ROUTES (Controllers)                    │
+│   auth_routes.py │ comic_routes.py │ admin_routes.py    │
+│         Flask Blueprints handle URL routing              │
+└────────────────────────┬────────────────────────────────┘
+                         │ Function Calls
+                         ▼
+┌─────────────────────────────────────────────────────────┐
+│                  SERVICES (Business Logic)               │
+│                   auth_service.py                        │
+│          Validation, role checks, orchestration          │
+└────────────────────────┬────────────────────────────────┘
+                         │ Function Calls
+                         ▼
+┌──────────────────────────────────────────────────────────┐
+│                  QUERIES (Data Access Layer)              │
+│  auth_queries.py │ comic_queries.py │ chapter_queries.py │
+│  admin_queries.py                                        │
+│         Raw SQL execution via psycopg3                   │
+└────────────────────────┬─────────────────────────────────┘
+                         │ SQL over TCP
+                         ▼
+┌─────────────────────────────────────────────────────────┐
+│                    PostgreSQL Database                   │
+│        7 Tables · ENUM Types · Indexes · FKs            │
+└─────────────────────────────────────────────────────────┘
+```
 
-### 3. `reader` (End Users)
-* **Purpose:** Regular users who consume the comic content.
-* **Columns:**
-  * `id` (BIGINT, Primary Key): Auto-incrementing unique identifier.
-  * `name` (VARCHAR 100): Reader's display name.
-  * `email` (VARCHAR 150, UNIQUE): Login email.
-  * `password` (TEXT): Hashed access credential.
-  * `created_at` (TIMESTAMPTZ): Account creation timestamp.
-* **Relationships:**
-  * **One-to-Many** with `reading_progress` (A reader can track progress across many chapters).
+### How It Works (Request Lifecycle)
+1. **User opens browser** → Flask serves an HTML template (Jinja2 rendered).
+2. **User submits form** → Route handler receives POST data.
+3. **Route calls Service** → Business logic validates input and enforces rules.
+4. **Service calls Query** → Raw SQL is executed against PostgreSQL via `psycopg`.
+5. **Query returns data** → Data flows back up through the layers to the template.
+6. **Template renders** → Final HTML is sent back to the browser.
 
-### 4. `comic` (The Core Publication)
-* **Purpose:** The central catalog entity representing a unique series/book.
-* **Columns:**
-  * `id` (BIGINT, Primary Key): Auto-incrementing unique identifier.
-  * `publisher_id` (BIGINT, Foreign Key): Links cleanly to `publisher.id`.
-  * `title` (TEXT): The name of the comic.
-  * `description` (TEXT): Synopsis or summary.
-  * `genre` (VARCHAR 80): Categorization metadata.
-  * `poster_url` (TEXT): Path/URL to the cover image.
-  * `status` (ENUM `comic_status`): Restricted to either `'draft'` or `'published'`. Defaults to `'draft'`.
-  * `created_at` (TIMESTAMPTZ): Timestamp of title creation.
-* **Constraints & Indexes:**
-  * `ON DELETE CASCADE` on `publisher_id`: If a publisher is deleted, their comics vanish automatically.
-  * **Indexes:** `idx_comic_publisher` and `idx_comic_status` for rapid querying and filtering.
-* **Relationships:**
-  * **One-to-Many** with `chapter` (A comic has many chapters).
+---
 
-### 5. `chapter` (Episodes / Issues)
-* **Purpose:** Represents individual episodic releases belonging to a `comic`.
-* **Columns:**
-  * `id` (BIGINT, Primary Key): Auto-incrementing unique identifier.
-  * `comic_id` (BIGINT, Foreign Key): Links directly to `comic.id`.
-  * `chapter_number` (INT): The sequential order of the chapter.
-  * `title` (TEXT): Optional chapter name (e.g., "The Awakening").
-  * `published_at` (TIMESTAMPTZ): Release timestamp.
-* **Constraints & Indexes:**
-  * `ON DELETE CASCADE` on `comic_id`: Deleting a comic strips all its chapters.
-  * **Composite UNIQUE Constraint** on `(comic_id, chapter_number)`: Strictly prevents accidental duplicate numbering (e.g., two "Chapter 5"s in the same comic).
-  * **Index:** `idx_chapter_comic` for fast joins.
-* **Relationships:**
-  * **One-to-Many** with `page` (A chapter has many pages).
-  * **One-to-Many** with `reading_progress` (A chapter is tracked by many readers).
+## 🗄️ Database Architecture & Schema Explanation (A to Z)
 
-### 6. `page` (Image Assets)
-* **Purpose:** Stores the exact sequence of images for the reader viewer.
-* **Columns:**
-  * `id` (BIGINT, Primary Key): Auto-incrementing unique identifier.
-  * `chapter_id` (BIGINT, Foreign Key): Links to `chapter.id`.
-  * `page_number` (INT): Defines the visual reading order.
-  * `image_url` (TEXT): File path or URL to the raw image panel.
-* **Constraints & Indexes:**
-  * `ON DELETE CASCADE` on `chapter_id`: Deleting a chapter purges its images.
-  * **Composite UNIQUE Constraint** on `(chapter_id, page_number)`: Ensures a single strict layout sequence (preventing duplicate "Page 1"s).
-  * **Index:** `idx_page_chapter` for lightning-fast sequential fetching.
+The application uses a **PostgreSQL** relational database with **7 tables**, **1 custom ENUM type**, **6 foreign keys**, **3 composite unique constraints**, and **6 performance indexes**.
 
-### 7. `reading_progress` (Junction / State Engine)
-* **Purpose:** Tracks where a `reader` left off inside a specific `chapter`.
-* **Columns:**
-  * `id` (BIGINT, Primary Key): Auto-incrementing unique identifier.
-  * `reader_id` (BIGINT, Foreign Key): Links to `reader.id`.
-  * `chapter_id` (BIGINT, Foreign Key): Links to `chapter.id`.
-  * `last_page` (INT): Remembers the last viewed page integer. Defaults to `1`.
-  * `completed` (BOOLEAN): Flag flipped to `TRUE` when they reach the final page. Defaults to `FALSE`.
-  * `updated_at` (TIMESTAMPTZ): Real-time timestamp of their last activity.
-* **Constraints & Indexes:**
-  * `ON DELETE CASCADE` on `reader_id` and `chapter_id`: If a user leaves or a chapter is removed, the progress table trims obsolete data instantly.
-  * **Composite UNIQUE Constraint** on `(reader_id, chapter_id)`: Limits to exactly ONE progress record per pair, avoiding duplicate history states.
-  * **Index:** `idx_progress_reader` to quickly load a reader's entire history dashboard.
+### Custom ENUM Type
+
+```sql
+CREATE TYPE comic_status AS ENUM ('draft', 'published');
+```
+Used by the `comic` table to restrict publication state to exactly two values.
+
+---
+
+### Table 1: `admin` — System Administrators
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | BIGINT | PRIMARY KEY, Auto-generated | Unique identifier |
+| `name` | VARCHAR(100) | NOT NULL | Administrator's full name |
+| `email` | VARCHAR(150) | NOT NULL, UNIQUE | Login email (no duplicates allowed) |
+| `password` | TEXT | NOT NULL | Access credential |
+| `created_at` | TIMESTAMPTZ | DEFAULT CURRENT_TIMESTAMP | Account creation timestamp |
+
+**Purpose:** Stores superuser accounts who can moderate the entire platform.
+
+---
+
+### Table 2: `publisher` — Content Creators
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | BIGINT | PRIMARY KEY, Auto-generated | Unique identifier |
+| `name` | VARCHAR(100) | NOT NULL | Publisher/studio display name |
+| `email` | VARCHAR(150) | NOT NULL, UNIQUE | Login email |
+| `password` | TEXT | NOT NULL | Access credential |
+| `logo_url` | TEXT | NULLABLE | Path to uploaded avatar/logo image |
+| `created_at` | TIMESTAMPTZ | DEFAULT CURRENT_TIMESTAMP | Account creation timestamp |
+
+**Purpose:** Users authorized to create and manage comic book content.
+**Relationships:** `publisher` → **One-to-Many** → `comic`
+
+---
+
+### Table 3: `reader` — End Users / Consumers
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | BIGINT | PRIMARY KEY, Auto-generated | Unique identifier |
+| `name` | VARCHAR(100) | NOT NULL | Display name |
+| `email` | VARCHAR(150) | NOT NULL, UNIQUE | Login email |
+| `password` | TEXT | NOT NULL | Access credential |
+| `created_at` | TIMESTAMPTZ | DEFAULT CURRENT_TIMESTAMP | Account creation timestamp |
+
+**Purpose:** Regular users who browse and read comics.
+**Relationships:** `reader` → **One-to-Many** → `reading_progress`
+
+---
+
+### Table 4: `comic` — Core Publication Entity
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | BIGINT | PRIMARY KEY, Auto-generated | Unique identifier |
+| `publisher_id` | BIGINT | NOT NULL, FOREIGN KEY → `publisher(id)` | Owner reference |
+| `title` | TEXT | NOT NULL | Comic book title |
+| `description` | TEXT | NULLABLE | Synopsis / summary |
+| `genre` | VARCHAR(80) | NULLABLE | Category tag (e.g., Action, Fantasy) |
+| `poster_url` | TEXT | NULLABLE | Path to cover image |
+| `status` | `comic_status` | DEFAULT `'draft'` | Publication state (`draft` or `published`) |
+| `created_at` | TIMESTAMPTZ | DEFAULT CURRENT_TIMESTAMP | Creation timestamp |
+
+**Purpose:** Central catalog entity representing a comic book series.
+**CASCADE Rule:** Deleting a publisher automatically deletes all their comics.
+**Indexes:** `idx_comic_publisher` (fast publisher lookups), `idx_comic_status` (fast filtering by draft/published)
+**Relationships:** `comic` → **One-to-Many** → `chapter`
+
+---
+
+### Table 5: `chapter` — Episodes / Issues
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | BIGINT | PRIMARY KEY, Auto-generated | Unique identifier |
+| `comic_id` | BIGINT | NOT NULL, FOREIGN KEY → `comic(id)` | Parent comic reference |
+| `chapter_number` | INT | NOT NULL | Sequential order number |
+| `title` | TEXT | NULLABLE | Optional chapter name |
+| `published_at` | TIMESTAMPTZ | DEFAULT CURRENT_TIMESTAMP | Release timestamp |
+
+**Purpose:** Episodic content units within a comic.
+**CASCADE Rule:** Deleting a comic automatically deletes all its chapters.
+**UNIQUE Constraint:** `(comic_id, chapter_number)` — Prevents duplicate chapter numbers (e.g., two "Chapter 3"s in the same comic).
+**Index:** `idx_chapter_comic` for fast chapter listing.
+**Relationships:** `chapter` → **One-to-Many** → `page` | `chapter` → **One-to-Many** → `reading_progress`
+
+---
+
+### Table 6: `page` — Image Assets / Panels
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | BIGINT | PRIMARY KEY, Auto-generated | Unique identifier |
+| `chapter_id` | BIGINT | NOT NULL, FOREIGN KEY → `chapter(id)` | Parent chapter reference |
+| `page_number` | INT | NOT NULL | Visual reading order |
+| `image_url` | TEXT | NOT NULL | File path to the image |
+
+**Purpose:** Stores the exact sequence of images that a reader views.
+**CASCADE Rule:** Deleting a chapter purges all its pages and image references.
+**UNIQUE Constraint:** `(chapter_id, page_number)` — Ensures no duplicate page numbers within a chapter.
+**Index:** `idx_page_chapter` for lightning-fast sequential fetching.
+
+---
+
+### Table 7: `reading_progress` — Bookmark / State Engine
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | BIGINT | PRIMARY KEY, Auto-generated | Unique identifier |
+| `reader_id` | BIGINT | NOT NULL, FOREIGN KEY → `reader(id)` | Which reader |
+| `chapter_id` | BIGINT | NOT NULL, FOREIGN KEY → `chapter(id)` | Which chapter |
+| `last_page` | INT | NOT NULL, DEFAULT `1` | Last viewed page number |
+| `completed` | BOOLEAN | DEFAULT `FALSE` | Flipped to TRUE on chapter completion |
+| `updated_at` | TIMESTAMPTZ | DEFAULT CURRENT_TIMESTAMP | Last activity timestamp |
+
+**Purpose:** Junction table that tracks exactly where each reader stopped in each chapter.
+**CASCADE Rule:** Removing a reader or chapter auto-cleans all progress records.
+**UNIQUE Constraint:** `(reader_id, chapter_id)` — Exactly ONE progress record per reader-chapter pair.
+**Index:** `idx_progress_reader` for quickly loading a reader's full history.
+
+---
+
+## 🔗 Entity Relationship Diagram (ERD)
+
+```
+┌──────────────┐
+│    admin     │          (Independent — no FK relationships)
+│──────────────│
+│ id (PK)      │
+│ name         │
+│ email (UQ)   │
+│ password     │
+│ created_at   │
+└──────────────┘
+
+
+┌──────────────┐       1 : N       ┌──────────────┐       1 : N       ┌──────────────┐
+│  publisher   │ ──────────────▶  │    comic     │ ──────────────▶  │   chapter    │
+│──────────────│                   │──────────────│                   │──────────────│
+│ id (PK)      │                   │ id (PK)      │                   │ id (PK)      │
+│ name         │                   │ publisher_id │◀── FK            │ comic_id     │◀── FK
+│ email (UQ)   │                   │ title        │                   │ chapter_number│
+│ password     │                   │ description  │                   │ title        │
+│ logo_url     │                   │ genre        │                   │ published_at │
+│ created_at   │                   │ poster_url   │                   └──────┬───────┘
+└──────────────┘                   │ status (ENUM)│                          │
+                                   │ created_at   │                    1 : N │
+                                   └──────────────┘                          ▼
+                                                                   ┌──────────────┐
+                                                                   │    page      │
+┌──────────────┐                                                   │──────────────│
+│   reader     │                                                   │ id (PK)      │
+│──────────────│                                                   │ chapter_id   │◀── FK
+│ id (PK)      │       1 : N       ┌──────────────────┐            │ page_number  │
+│ name         │ ──────────────▶  │ reading_progress  │            │ image_url    │
+│ email (UQ)   │                   │──────────────────│            └──────────────┘
+│ password     │                   │ id (PK)          │
+│ created_at   │                   │ reader_id (FK)   │◀── FK to reader
+└──────────────┘                   │ chapter_id (FK)  │◀── FK to chapter
+                                   │ last_page        │
+                                   │ completed         │
+                                   │ updated_at        │
+                                   └──────────────────┘
+```
+
+### Relationship Summary Table
+
+| Relationship | Type | FK Column | CASCADE Behavior |
+|-------------|------|-----------|-----------------|
+| `publisher` → `comic` | One-to-Many | `comic.publisher_id` | Delete publisher → deletes all their comics |
+| `comic` → `chapter` | One-to-Many | `chapter.comic_id` | Delete comic → deletes all chapters |
+| `chapter` → `page` | One-to-Many | `page.chapter_id` | Delete chapter → deletes all pages |
+| `reader` → `reading_progress` | One-to-Many | `reading_progress.reader_id` | Delete reader → deletes all progress |
+| `chapter` → `reading_progress` | One-to-Many | `reading_progress.chapter_id` | Delete chapter → deletes all progress |
+
+### Full Cascade Chain
+```
+Delete Publisher → Comics → Chapters → Pages (files + DB rows)
+                                    → Reading Progress records
+```
+
+---
 
 ## 📁 Project Folder Structure
 
-A well-organized directory structure separates concerns and keeps the application scalable:
-
 ```text
 Comic_Book_Reading_Platform/
-├── app/                  # Main application package
-│   ├── queries/          # SQL queries and database interaction functions
-│   ├── routes/           # Flask blueprint routing and controllers
-│   ├── services/         # Business logic and complex operations
-│   ├── static/           # Static assets like CSS, JS, and logos
-│   ├── templates/        # HTML templates for rendering views
-│   ├── utils/            # Helper functions and utilities
-│   ├── screenshot/       # Contains screenshots for documentation
-│   ├── db.py             # Database connection setup
-│   └── __init__.py       # Application factory and initialization
-├── Data/                 # File storage
-│   └── comics/           # Uploaded comic pages and covers
-├── docs/                 # Documentation and database schema SQL
-├── insert_admin.py       # Helper script to create an initial admin
-├── pyproject.toml        # Project definitions and dependencies
-├── run.py                # Waitress/development server runner
-└── main.py               # Application entry point alternative
+│
+├── 📂 app/                          # Main application package
+│   ├── __init__.py                  # Application factory (create_app)
+│   ├── db.py                        # Database connection setup (psycopg)
+│   ├── .env                         # Environment variables (DB credentials)
+│   ├── requirements.txt             # Python dependency list
+│   │
+│   ├── 📂 routes/                   # Flask Blueprint controllers
+│   │   ├── auth_routes.py           # Login, Register, Logout, Home redirect
+│   │   ├── comic_routes.py          # Reader views, Publisher CRUD, Chapter/Page management
+│   │   └── admin_routes.py          # Admin dashboard and moderation
+│   │
+│   ├── 📂 services/                 # Business logic layer
+│   │   └── auth_service.py          # User registration & login validation
+│   │
+│   ├── 📂 queries/                  # SQL data access layer
+│   │   ├── auth_queries.py          # INSERT/SELECT for admin, publisher, reader tables
+│   │   ├── comic_queries.py         # CRUD operations for comic table
+│   │   ├── chapter_queries.py       # CRUD operations for chapter & page tables
+│   │   └── admin_queries.py         # Admin-specific data queries
+│   │
+│   ├── 📂 utils/                    # Helper functions
+│   │   ├── __init__.py              # Package init
+│   │   └── upload_utils.py          # File saving, validation, poster/logo/page handlers
+│   │
+│   ├── 📂 templates/                # Jinja2 HTML templates (10 pages)
+│   │   ├── login.html               # Login form (role selector + email/password)
+│   │   ├── register.html            # Registration form (with logo upload for publishers)
+│   │   ├── info.html                # Project information / about page
+│   │   ├── reader_home.html         # Reader library — comic grid with thumbnails
+│   │   ├── reader_comic.html        # Comic detail view — chapters list
+│   │   ├── reader_no_content.html   # Empty state when no comics are published
+│   │   ├── publisher_home.html      # Publisher dashboard — own comic catalog
+│   │   ├── publisher_edit.html      # Edit comic metadata form
+│   │   ├── publisher_chapters.html  # Chapter management — add/upload/delete chapters
+│   │   └── admin_home.html          # Admin moderation panel — all comics overview
+│   │
+│   ├── 📂 static/                   # Static assets
+│   │   ├── style.css                # Global stylesheet (12KB, Brutalist Minimalist design)
+│   │   └── 📂 background/          # Background images used in UI
+│   │
+│   └── 📂 screenshot/              # Documentation screenshots
+│       ├── publisher_page.png       # Publisher dashboard screenshot
+│       ├── edit_page.png            # Edit comic page screenshot
+│       └── admin_page.png           # Admin dashboard screenshot
+│
+├── 📂 Data/                         # Runtime file storage (gitignored in production)
+│   └── 📂 comics/                   # Uploaded comic content
+│       └── 📂 {comic_id}/          # Per-comic folder
+│           ├── poster.{ext}         # Cover image
+│           └── 📂 chapters/
+│               └── 📂 {chapter_num}/
+│                   ├── 1.{ext}      # Page 1 image
+│                   ├── 2.{ext}      # Page 2 image
+│                   └── ...          # More pages
+│
+├── 📂 docs/                         # Documentation & reference
+│   ├── comic_platform_database.sql  # Full PostgreSQL schema (CREATE TABLE statements)
+│   ├── Comic book platform database design.mhtml  # Visual database design reference
+│   └── sppu.pdf                     # SPPU university reference document
+│
+├── insert_admin.py                  # Script to seed the default admin account
+├── run.py                           # Development server launcher (with dep & DB checks)
+├── main.py                          # Minimal app entry point
+├── pyproject.toml                   # Project metadata & dependencies (uv/pip)
+├── uv.lock                          # Locked dependency versions
+├── .gitignore                       # Git exclusion rules
+└── README.md                        # 👈 You are here
 ```
+
+---
+
+## 📄 File-by-File Explanation
+
+### Root-Level Files
+
+| File | Purpose |
+|------|---------|
+| `run.py` | **Primary entry point.** Prints a banner, checks all dependencies (Flask, PIL, psycopg, dotenv), tests the database connection, and starts the Flask dev server on port 5000. |
+| `main.py` | **Minimal alternative** entry point — just imports `create_app()` and runs. |
+| `insert_admin.py` | **Seed script** — Inserts a default admin account (`admin@example.com` / `adminpass`). If an admin already exists, it updates the credentials instead. |
+| `pyproject.toml` | Declares project name, Python version requirement (≥3.12), and core dependencies for `uv`/`pip`. |
+| `uv.lock` | Auto-generated lockfile ensuring reproducible dependency installs. |
+| `.gitignore` | Excludes `.venv/`, `__pycache__/`, `*.pyc`, `.env`, and IDE config files from version control. |
+
+### `app/` — Core Application Package
+
+| File | Purpose |
+|------|---------|
+| `__init__.py` | **Application Factory** — Creates the Flask app, sets `SECRET_KEY`, configures 16MB upload limit, registers all 3 Blueprints, defines the `/` root redirect and `/data/<path>` static file serving route. |
+| `db.py` | **Database Connection** — Uses `psycopg.connect()` with `dict_row` factory so query results return as dictionaries. Includes a standalone test block for connection verification. |
+
+### `app/routes/` — Controllers (Flask Blueprints)
+
+| File | Blueprint | Routes Count | Key Responsibilities |
+|------|-----------|:------------:|---------------------|
+| `auth_routes.py` | `auth_bp` | 6 | User registration (with publisher logo upload), login (with role-based session creation and redirect), logout (session clear), and `/home` info page. |
+| `comic_routes.py` | `comic_bp` | 11 | Reader: comic browsing, chapter reading. Publisher: create/edit/delete comics, chapter management, multi-image page uploads. |
+| `admin_routes.py` | `admin_bp` | 2 | Admin dashboard view, force-delete any comic from the platform. |
+
+### `app/services/` — Business Logic
+
+| File | Purpose |
+|------|---------|
+| `auth_service.py` | Validates roles against `VALID_ROLES = ["admin", "publisher", "reader"]`, delegates to query layer for user creation and authentication. Acts as a guard ensuring only valid roles reach the database. |
+
+### `app/queries/` — Data Access Layer (Raw SQL)
+
+| File | Tables Touched | Key Operations |
+|------|---------------|----------------|
+| `auth_queries.py` | `admin`, `publisher`, `reader` | `create_user()` — INSERT with RETURNING · `get_user()` — SELECT by email+password · `get_publisher_by_id()` — Fetch publisher details including logo |
+| `comic_queries.py` | `comic` | Create comic · Get all published comics · Get publisher's comics · Get comic by ID · Update comic metadata · Delete comic |
+| `chapter_queries.py` | `chapter`, `page` | Create chapter · Get chapters by comic · Delete chapter · Insert page records · Get pages by chapter |
+| `admin_queries.py` | `comic`, `publisher` | Get all comics with publisher names (JOIN) · Delete any comic by ID |
+
+### `app/utils/` — Utility Functions
+
+| File | Purpose |
+|------|---------|
+| `upload_utils.py` | **File Upload Engine** — Handles all file I/O. Functions: `allowed_file()` (extension validation), `save_upload()` (generic save to Data/), `save_poster()` (comic cover), `save_publisher_logo()` (publisher avatar), `save_page_image()` (chapter pages), `delete_folder()` / `delete_file()` (cascade cleanup). Supports: PNG, JPG, JPEG, WebP, GIF, JFIF. |
+
+### `app/templates/` — Jinja2 HTML Pages
+
+| Template | Rendered By | Description |
+|----------|------------|-------------|
+| `login.html` | `GET /login` | Login form with role dropdown (Admin/Publisher/Reader), email, and password fields |
+| `register.html` | `GET /register` | Registration form with role selector, name, email, password, and optional logo upload for publishers |
+| `info.html` | `GET /home` | Project information page with academic details |
+| `reader_home.html` | `GET /reader_home` | Comic library grid — displays published comics with cover thumbnails |
+| `reader_comic.html` | `GET /read/<id>` | Individual comic detail view — shows cover, description, and chapter list |
+| `reader_no_content.html` | (conditional) | Empty state fallback when no published comics exist |
+| `publisher_home.html` | `GET /publisher_home` | Publisher's personal dashboard — CRUD controls for their comics |
+| `publisher_edit.html` | `GET /publisher/edit/<id>` | Pre-filled form to update comic title, description, genre, and poster |
+| `publisher_chapters.html` | `GET /publisher/comic/<id>/chapters` | Chapter management — add new chapters, upload page images, delete chapters |
+| `admin_home.html` | `GET /admin_home` | Admin moderation panel — view all comics across all publishers with delete controls |
+
+---
 
 ## 📸 Screenshots
 
@@ -158,87 +465,156 @@ Comic_Book_Reading_Platform/
 ### Admin Dashboard
 ![Admin Page](app/screenshot/admin_page.png)
 
+---
+
 ## ⚙️ How to Run Locally
 
-### 1. Requirements
-- Python 3.12+
-- PostgreSQL Server installed and running
+### Step 1 — Prerequisites
+| Requirement | Version |
+|------------|---------|
+| Python | 3.12 or higher |
+| PostgreSQL | 16+ (server must be running) |
+| pip or uv | Latest |
 
-### 2. Database Setup
-1. Open your PostgreSQL console (using `psql` or pgAdmin).
-2. Execute the schema to table creation. You can run the provided SQL script:
-   ```bash
-   psql -U postgres -f docs/comic_platform_database.sql
-   ```
-3. Update your `.env` file (create one if not present in the project root) with your database credentials. For example:
-   ```env
-   DB_HOST=localhost
-   DB_USER=postgres
-   DB_PASSWORD=yourpassword
-   DB_NAME=postgres
-   ```
-
-### 3. Install Dependencies
-You can install the dependencies via `pip` or using `uv` (recommended):
+### Step 2 — Clone the Repository
 ```bash
-# Using uv (fastest)
+git clone https://github.com/SahilKaturde/COMIC_BOOK_READING_-PLATFORM-.git
+cd COMIC_BOOK_READING_-PLATFORM-
+```
+
+### Step 3 — Database Setup
+1. Open your PostgreSQL console (`psql` or pgAdmin).
+2. Create the database and run the schema:
+   ```bash
+   psql -U postgres -c "CREATE DATABASE Comic_Book_Reading_Platform_db;"
+   psql -U postgres -d Comic_Book_Reading_Platform_db -f docs/comic_platform_database.sql
+   ```
+3. Update the database connection string in `app/db.py` with your credentials:
+   ```python
+   psycopg.connect(
+       "dbname=Comic_Book_Reading_Platform_db user=postgres password=YOUR_PASSWORD host=localhost port=5432",
+       row_factory=dict_row
+   )
+   ```
+
+### Step 4 — Install Dependencies
+```bash
+# Using uv (recommended — fastest)
 uv sync
 
 # Or using standard pip
 pip install -r app/requirements.txt
 ```
 
-### 4. Create an Admin User (Optional)
-To setup the initial admin account, simply execute:
+### Step 5 — Seed the Admin Account (Optional)
 ```bash
 python insert_admin.py
 ```
+This creates the default admin account (see [Default Credentials](#-default-credentials) below).
 
-### 5. Start the Server
-Run the development server natively:
+### Step 6 — Start the Server
 ```bash
 python run.py
 ```
-*Alternatively, you can just run `python main.py`.*
-Access the application locally at: **http://127.0.0.1:5000**.
+*Or alternatively:* `python main.py`
+
+🌐 **Access the app at: [http://127.0.0.1:5000](http://127.0.0.1:5000)**
 
 ---
 
-## 🔗 Endpoints Reference (Exam Revision Guide)
+## 🔑 Default Credentials
 
-Below is a detailed list of all routes available in the system. Use this to quickly revise what each block of code on the backend accomplishes.
+After running `insert_admin.py`, the following admin account is available:
+
+| Field | Value |
+|-------|-------|
+| **Role** | Admin |
+| **Email** | `admin@example.com` |
+| **Password** | `adminpass` |
+
+> ⚠️ **Note:** Change these credentials immediately in a production environment.
+
+---
+
+## 🌍 Environment Variables
+
+The application reads database configuration from `app/db.py`. For production setups, use the `.env` file:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DB_HOST` | `localhost` | PostgreSQL server hostname |
+| `DB_USER` | `postgres` | Database user |
+| `DB_PASSWORD` | *(your password)* | Database password |
+| `DB_NAME` | `Comic_Book_Reading_Platform_db` | Database name |
+| `DB_PORT` | `5432` | PostgreSQL port |
+
+---
+
+## 🔗 API Endpoints Reference
 
 ### 🔐 Authentication Routes (`auth_routes.py`)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| **GET** | `/register` | Renders the HTML registration form. |
-| **POST** | `/register` | Handles form submission to create a new user (Reader, Publisher, or Admin). |
-| **GET** | `/login` | Renders the login HTML page. |
-| **POST** | `/login` | Authenticates user credentials against the database and creates a session. |
-| **GET** | `/logout` | Clears local sessions and logs the user out. |
-| **GET** | `/home` | Redirects mapped logic: takes a logged-in user to their respective dashboard (`reader_home`, `publisher_home`, or `admin_home`) based on their assigned role. |
+| **GET** | `/` | Root — redirects logged-in users to their dashboard, otherwise to `/login` |
+| **GET** | `/register` | Renders the registration form |
+| **POST** | `/register` | Handles form submission — creates user account (with logo upload for publishers) |
+| **GET** | `/login` | Renders the login page |
+| **POST** | `/login` | Authenticates credentials, creates session, redirects to role-specific dashboard |
+| **GET** | `/logout` | Clears session and redirects to login |
+| **GET** | `/home` | Renders the project information page |
 
 ### 📚 Reader & Publisher Routes (`comic_routes.py`)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| **GET** | `/reader_home` | Main library view where readers browse thumbnails of available comics. |
-| **GET** | `/read/<comic_id>` | Specific comic overview (cover, title, description, and list of chapters). |
-| **GET** | `/read/<comic_id>/<chapter_number>` | Shows the image files associated with a specific chapter for inline reading. |
-| **GET** | `/publisher_home` | Publisher's centralized dashboard showing exactly what comics they have published. |
-| **POST** | `/publisher/create` | Receives metadata to create and insert a new comic title. |
-| **GET** | `/publisher/edit/<comic_id>` | Renders a pre-filled form allowing publishers to review and edit comic metadata. |
-| **POST** | `/publisher/edit/<comic_id>` | Commits the updated metadata changes (such as title, summary) to the database. |
-| **POST** | `/publisher/delete/<comic_id>` | Permanently removes a publisher's own comic and its chapters. |
-| **GET** | `/publisher/comic/<comic_id>/chapters` | Shows the granular list of all chapters for a specific comic created by the publisher. |
-| **POST** | `/publisher/comic/<comic_id>/chapter/create` | Inserts a new empty chapter row mapped to a given comic. |
-| **POST** | `/publisher/comic/<comic_id>/chapter/<chapter_num>/upload` | High-level method for handling multiple image byte uploads and mapping them to a specific chapter. |
-| **POST** | `/publisher/chapter/<chapter_id>/delete` | Granular deletion of a specific chapter. |
+| **GET** | `/reader_home` | Main library view — browse published comic thumbnails |
+| **GET** | `/read/<comic_id>` | Comic detail — cover, title, description, chapters list |
+| **GET** | `/read/<comic_id>/<chapter_number>` | Chapter reader — sequential page images |
+| **GET** | `/publisher_home` | Publisher dashboard — own comic catalog with CRUD controls |
+| **POST** | `/publisher/create` | Create a new comic title with metadata and poster |
+| **GET** | `/publisher/edit/<comic_id>` | Pre-filled edit form for comic metadata |
+| **POST** | `/publisher/edit/<comic_id>` | Commit updated comic metadata to database |
+| **POST** | `/publisher/delete/<comic_id>` | Permanently delete a comic and all its content |
+| **GET** | `/publisher/comic/<comic_id>/chapters` | Chapter management page for a specific comic |
+| **POST** | `/publisher/comic/<comic_id>/chapter/create` | Insert a new chapter |
+| **POST** | `/publisher/comic/<comic_id>/chapter/<chapter_num>/upload` | Upload multiple page images to a chapter |
+| **POST** | `/publisher/chapter/<chapter_id>/delete` | Delete a specific chapter |
 
 ### 🛡️ Admin Routes (`admin_routes.py`)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| **GET** | `/admin_home` | Superuser overview displaying analytics, users, or platform-wide catalogs. |
-| **POST** | `/admin/delete_comic/<comic_id>` | Enables a site administrator to forcefully censor or remove comics that bypass platform rules. |
+| **GET** | `/admin_home` | Admin moderation panel — view all comics with publisher info |
+| **POST** | `/admin/delete_comic/<comic_id>` | Force-delete any comic from the platform |
+
+### 📁 Static File Route (defined in `__init__.py`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| **GET** | `/data/<path:filename>` | Serves uploaded files (posters, page images) from the `Data/` directory |
 
 ---
-**Best of luck with your exams! You've got this.**
+
+## 🔄 Application Workflow
+
+### Reader Flow
+```
+Login → Reader Home (Browse Comics) → Click Comic → View Chapters → Read Pages → Progress Saved
+```
+
+### Publisher Flow
+```
+Register → Login → Publisher Dashboard → Create Comic → Add Chapters → Upload Pages → Publish
+                                       → Edit Comic Metadata
+                                       → Delete Comic (cascade removes all content)
+```
+
+### Admin Flow
+```
+Login → Admin Dashboard (View All Comics) → Delete Inappropriate Comics
+```
+
+---
+
+<p align="center">
+  <b>⭐ If you found this project helpful, give it a star on GitHub!</b><br/><br/>
+  Made with ❤️ using Python & Flask<br/>
+  <b>Best of luck with your exams! You've got this. 🎓</b>
+</p>

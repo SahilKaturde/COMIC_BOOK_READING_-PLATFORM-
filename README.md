@@ -25,15 +25,100 @@ The platform supports three distinct user roles:
 - **Environment Management**: `python-dotenv`
 - **Package Management**: `uv` / `pip`
 
-## 🗄️ Database Architecture & Schema Explanation
+## 🗄️ Database Architecture & Schema Explanation (A to Z Details)
 
-The application leverages a robust relational PostgreSQL database comprising 7 core tables:
+The application leverages a robust relational PostgreSQL database comprising 7 core tables. Below is the complete "biodata" and relationship mapping for every entity in the system, detailing all types, constraints, defaults, and architectural decisions.
 
-1. **`admin` / `publisher` / `reader`**: These three tables separately handle user identities, credentials, and roles. Splitting them avoids monolithic "users" tables and strictly enforces role-based responsibilities dynamically via separate foreign key bindings.
-2. **`comic`**: The central entity representing a publication. It is directly linked to a `publisher_id` (Foreign Key) to establish ownership. It natively tracks its publication state via a custom ENUM `comic_status` ('draft' or 'published').
-3. **`chapter`**: A one-to-many child of the `comic` table. It strictly enforces a unique constraint on `(comic_id, chapter_number)` to prevent a publisher from accidentally generating duplicate chapters (e.g., two "Chapter 1"s in the same comic).
-4. **`page`**: A one-to-many child of `chapter`. Stores the exact file paths/URLs of the panels or pages. It enforces a unique constraint on `(chapter_id, page_number)` so the reader's progression is identically ordered as published.
-5. **`reading_progress`**: A junction mapping table bridging a `reader_id` to a `chapter_id`. It dynamically increments and saves the `last_page` integer a user was currently viewing and flags `completed=True` when they reach the end for accurate bookmarks.
+### 1. `admin` (System Administrators)
+* **Purpose:** Stores credentials for superusers who manage the platform.
+* **Columns:**
+  * `id` (BIGINT, Primary Key): Auto-incrementing unique identifier.
+  * `name` (VARCHAR 100): Administrator's full name.
+  * `email` (VARCHAR 150, UNIQUE): Login email, guaranteed unique.
+  * `password` (TEXT): Hashed access credential.
+  * `created_at` (TIMESTAMPTZ): Automatically records creation time.
+
+### 2. `publisher` (Content Creators)
+* **Purpose:** Represents users authorized to create and upload comic books.
+* **Columns:**
+  * `id` (BIGINT, Primary Key): Auto-incrementing unique identifier.
+  * `name` (VARCHAR 100): Publisher's display name or studio name.
+  * `email` (VARCHAR 150, UNIQUE): Login email.
+  * `password` (TEXT): Hashed access credential.
+  * `logo_url` (TEXT): Optional path to the publisher's avatar/logo.
+  * `created_at` (TIMESTAMPTZ): Account creation timestamp.
+* **Relationships:**
+  * **One-to-Many** with `comic` (A publisher can own many comics).
+
+### 3. `reader` (End Users)
+* **Purpose:** Regular users who consume the comic content.
+* **Columns:**
+  * `id` (BIGINT, Primary Key): Auto-incrementing unique identifier.
+  * `name` (VARCHAR 100): Reader's display name.
+  * `email` (VARCHAR 150, UNIQUE): Login email.
+  * `password` (TEXT): Hashed access credential.
+  * `created_at` (TIMESTAMPTZ): Account creation timestamp.
+* **Relationships:**
+  * **One-to-Many** with `reading_progress` (A reader can track progress across many chapters).
+
+### 4. `comic` (The Core Publication)
+* **Purpose:** The central catalog entity representing a unique series/book.
+* **Columns:**
+  * `id` (BIGINT, Primary Key): Auto-incrementing unique identifier.
+  * `publisher_id` (BIGINT, Foreign Key): Links cleanly to `publisher.id`.
+  * `title` (TEXT): The name of the comic.
+  * `description` (TEXT): Synopsis or summary.
+  * `genre` (VARCHAR 80): Categorization metadata.
+  * `poster_url` (TEXT): Path/URL to the cover image.
+  * `status` (ENUM `comic_status`): Restricted to either `'draft'` or `'published'`. Defaults to `'draft'`.
+  * `created_at` (TIMESTAMPTZ): Timestamp of title creation.
+* **Constraints & Indexes:**
+  * `ON DELETE CASCADE` on `publisher_id`: If a publisher is deleted, their comics vanish automatically.
+  * **Indexes:** `idx_comic_publisher` and `idx_comic_status` for rapid querying and filtering.
+* **Relationships:**
+  * **One-to-Many** with `chapter` (A comic has many chapters).
+
+### 5. `chapter` (Episodes / Issues)
+* **Purpose:** Represents individual episodic releases belonging to a `comic`.
+* **Columns:**
+  * `id` (BIGINT, Primary Key): Auto-incrementing unique identifier.
+  * `comic_id` (BIGINT, Foreign Key): Links directly to `comic.id`.
+  * `chapter_number` (INT): The sequential order of the chapter.
+  * `title` (TEXT): Optional chapter name (e.g., "The Awakening").
+  * `published_at` (TIMESTAMPTZ): Release timestamp.
+* **Constraints & Indexes:**
+  * `ON DELETE CASCADE` on `comic_id`: Deleting a comic strips all its chapters.
+  * **Composite UNIQUE Constraint** on `(comic_id, chapter_number)`: Strictly prevents accidental duplicate numbering (e.g., two "Chapter 5"s in the same comic).
+  * **Index:** `idx_chapter_comic` for fast joins.
+* **Relationships:**
+  * **One-to-Many** with `page` (A chapter has many pages).
+  * **One-to-Many** with `reading_progress` (A chapter is tracked by many readers).
+
+### 6. `page` (Image Assets)
+* **Purpose:** Stores the exact sequence of images for the reader viewer.
+* **Columns:**
+  * `id` (BIGINT, Primary Key): Auto-incrementing unique identifier.
+  * `chapter_id` (BIGINT, Foreign Key): Links to `chapter.id`.
+  * `page_number` (INT): Defines the visual reading order.
+  * `image_url` (TEXT): File path or URL to the raw image panel.
+* **Constraints & Indexes:**
+  * `ON DELETE CASCADE` on `chapter_id`: Deleting a chapter purges its images.
+  * **Composite UNIQUE Constraint** on `(chapter_id, page_number)`: Ensures a single strict layout sequence (preventing duplicate "Page 1"s).
+  * **Index:** `idx_page_chapter` for lightning-fast sequential fetching.
+
+### 7. `reading_progress` (Junction / State Engine)
+* **Purpose:** Tracks where a `reader` left off inside a specific `chapter`.
+* **Columns:**
+  * `id` (BIGINT, Primary Key): Auto-incrementing unique identifier.
+  * `reader_id` (BIGINT, Foreign Key): Links to `reader.id`.
+  * `chapter_id` (BIGINT, Foreign Key): Links to `chapter.id`.
+  * `last_page` (INT): Remembers the last viewed page integer. Defaults to `1`.
+  * `completed` (BOOLEAN): Flag flipped to `TRUE` when they reach the final page. Defaults to `FALSE`.
+  * `updated_at` (TIMESTAMPTZ): Real-time timestamp of their last activity.
+* **Constraints & Indexes:**
+  * `ON DELETE CASCADE` on `reader_id` and `chapter_id`: If a user leaves or a chapter is removed, the progress table trims obsolete data instantly.
+  * **Composite UNIQUE Constraint** on `(reader_id, chapter_id)`: Limits to exactly ONE progress record per pair, avoiding duplicate history states.
+  * **Index:** `idx_progress_reader` to quickly load a reader's entire history dashboard.
 
 ## 📁 Project Folder Structure
 

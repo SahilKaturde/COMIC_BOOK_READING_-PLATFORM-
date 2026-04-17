@@ -4,7 +4,7 @@ from psycopg.rows import dict_row
 
 def get_db():
     return psycopg.connect(
-        "dbname=Comic_Book_Reading_Platform_db user=postgres password=[PASSWORD] host=localhost port=5432",
+        "dbname=Comic_Book_Reading_Platform_db user=postgres password=sahil@1234 host=localhost port=5432",
         row_factory=dict_row
     )
 

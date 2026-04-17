@@ -22,7 +22,7 @@
 
     <!-- Page Title -->
     <div class="page-title">
-        <h2>Library</h2>
+        <h2>📚 Library</h2>
         <p>Browse all available comics</p>
     </div>
 
@@ -32,31 +32,29 @@
         {% for comic in comics %}
         <a href="/read/{{ comic.id }}" class="comic-card-link">
             <div class="comic-card">
-                {% if comic.poster_url %}
                 <div class="comic-poster">
-                    <img src="/data/{{ comic.poster_url }}" alt="{{ comic.title }} cover"
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="comic-poster-fallback" style="display:none;">
-                        <span>{{ comic.title[:2] | upper }}</span>
-                    </div>
+                    {% if comic.poster_url %}
+                    <img src="/data/{{ comic.poster_url }}" alt="{{ comic.title }} cover">
+                    {% else %}
+                    <div class="comic-poster-fallback">CBRP</div>
+                    {% endif %}
                 </div>
-                {% else %}
-                <div class="comic-poster">
-                    <div class="comic-poster-fallback">
-                        <span>{{ comic.title[:2] | upper }}</span>
-                    </div>
-                </div>
-                {% endif %}
 
                 <div class="comic-info">
                     <h3 class="comic-title">{{ comic.title }}</h3>
-                    <p class="comic-meta">{{ comic.publisher_name }}</p>
-                    {% if comic.genre %}
-                    <span class="comic-genre">{{ comic.genre }}</span>
-                    {% endif %}
+                    <div class="comic-meta">
+                        <span class="comic-genre">🖋️ {{ comic.publisher_name }}</span>
+                        {% if comic.genre %}
+                        <span class="comic-genre">{{ comic.genre | upper }}</span>
+                        {% endif %}
+                    </div>
                     {% if comic.description %}
-                    <p class="comic-desc">{{ comic.description[:80] }}{% if comic.description|length > 80 %}…{% endif %}</p>
+                    <p class="comic-desc">{{ comic.description[:100] }}{% if comic.description|length > 100 %}…{% endif %}</p>
                     {% endif %}
+                    
+                    <div class="card-actions">
+                        <span class="btn-small btn-invert">Read Now 📖</span>
+                    </div>
                 </div>
             </div>
         </a>
@@ -64,8 +62,8 @@
     </div>
     {% else %}
     <div class="empty-state">
-        <p>No comics available yet.</p>
-        <p>Check back soon!</p>
+        <p>NO COMICS AVAILABLE YET. 🥺</p>
+        <p>CHECK BACK SOON!</p>
     </div>
     {% endif %}
 </div>

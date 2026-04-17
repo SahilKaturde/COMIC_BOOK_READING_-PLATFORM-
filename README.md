@@ -319,7 +319,6 @@ Comic_Book_Reading_Platform/
 │   ├── __init__.py                  # Application factory (create_app)
 │   ├── db.py                        # Database connection setup (psycopg)
 │   ├── .env                         # Environment variables (DB credentials)
-│   ├── requirements.txt             # Python dependency list
 │   │
 │   ├── 📂 routes/                   # Flask Blueprint controllers
 │   │   ├── auth_routes.py           # Login, Register, Logout, Home redirect
@@ -375,9 +374,8 @@ Comic_Book_Reading_Platform/
 │   ├── Comic book platform database design.mhtml  # Visual database design reference
 │   └── sppu.pdf                     # SPPU university reference document
 │
-├── insert_admin.py                  # Script to seed the default admin account
-├── run.py                           # Development server launcher (with dep & DB checks)
-├── main.py                          # Minimal app entry point
+├── app.py                           # 🚀 CONSOLIDATED ENTRY POINT (Starter + Seeder + App)
+├── requirements.txt                 # Project dependencies
 ├── pyproject.toml                   # Project metadata & dependencies (uv/pip)
 ├── uv.lock                          # Locked dependency versions
 ├── .gitignore                       # Git exclusion rules
@@ -392,9 +390,7 @@ Comic_Book_Reading_Platform/
 
 | File | Purpose |
 |------|---------|
-| `run.py` | **Primary entry point.** Prints a banner, checks all dependencies (Flask, PIL, psycopg, dotenv), tests the database connection, and starts the Flask dev server on port 5000. |
-| `main.py` | **Minimal alternative** entry point — just imports `create_app()` and runs. |
-| `insert_admin.py` | **Seed script** — Inserts a default admin account (`admin@example.com` / `adminpass`). If an admin already exists, it updates the credentials instead. |
+| `requirements.txt`| **Dependencies.** List of all required Python libraries. |
 | `pyproject.toml` | Declares project name, Python version requirement (≥3.12), and core dependencies for `uv`/`pip`. |
 | `uv.lock` | Auto-generated lockfile ensuring reproducible dependency installs. |
 | `.gitignore` | Excludes `.venv/`, `__pycache__/`, `*.pyc`, `.env`, and IDE config files from version control. |
@@ -403,8 +399,9 @@ Comic_Book_Reading_Platform/
 
 | File | Purpose |
 |------|---------|
-| `__init__.py` | **Application Factory** — Creates the Flask app, sets `SECRET_KEY`, configures 16MB upload limit, registers all 3 Blueprints, defines the `/` root redirect and `/data/<path>` static file serving route. |
-| `db.py` | **Database Connection** — Uses `psycopg.connect()` with `dict_row` factory so query results return as dictionaries. Includes a standalone test block for connection verification. |
+| `run.py` | **Primary entry point.** Handles dependency checks, database connectivity, automatic admin seeding, and starts the server. |
+| `__init__.py` | **Application Factory** — Creates the Flask app and registers blueprints. |
+| `db.py` | **Database Connection** — Handles PostgreSQL connectivity. |
 
 ### `app/routes/` — Controllers (Flask Blueprints)
 
@@ -503,20 +500,22 @@ cd COMIC_BOOK_READING_-PLATFORM-
 uv sync
 
 # Or using standard pip
-pip install -r app/requirements.txt
+pip install -r requirements.txt
 ```
 
-### Step 5 — Seed the Admin Account (Optional)
+### Step 5 — Start the Server
+Navigate to the `app` folder and run the server:
 ```bash
-python insert_admin.py
-```
-This creates the default admin account (see [Default Credentials](#-default-credentials) below).
-
-### Step 6 — Start the Server
-```bash
+cd app
 python run.py
 ```
-*Or alternatively:* `python main.py`
+This automatically verifies your installation, checks the database, and ensures a default admin account exists.
+
+Alternatively, if running `uv`:
+```bash
+cd app
+uv run run.py
+```
 
 🌐 **Access the app at: [http://127.0.0.1:5000](http://127.0.0.1:5000)**
 

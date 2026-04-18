@@ -75,7 +75,7 @@
             <div class="pages-grid">
                 {% for page in chapter.pages %}
                 <div class="page-thumb">
-                    <img src="/data/{{ page.image_url }}" alt="Page {{ page.page_number }}">
+                    <img src="{{ image_url(page.image_url) }}" alt="Page {{ page.page_number }}">
                     <span>Page {{ page.page_number }}</span>
                 </div>
                 {% endfor %}

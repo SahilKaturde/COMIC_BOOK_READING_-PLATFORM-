@@ -28,6 +28,17 @@ def create_app():
     def serve_data(filename):
         return send_from_directory(DATA_ROOT, filename)
 
+    # Template helper for image URLs (handles local vs Cloudinary)
+    @app.context_processor
+    def utility_processor():
+        def image_url(path):
+            if not path:
+                return ""
+            if path.startswith("http"):
+                return path
+            return f"/data/{path}"
+        return dict(image_url=image_url)
+
     # Fast Flow Index: Redirect to dashboard based on role
     @app.route("/")
     def index():

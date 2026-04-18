@@ -34,7 +34,7 @@
             <div class="comic-card">
                 <div class="comic-poster">
                     {% if comic.poster_url %}
-                    <img src="/data/{{ comic.poster_url }}" alt="{{ comic.title }} cover">
+                    <img src="{{ image_url(comic.poster_url) }}" alt="{{ comic.title }} cover">
                     {% else %}
                     <div class="comic-poster-fallback">CBRP</div>
                     {% endif %}

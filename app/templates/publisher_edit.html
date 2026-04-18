@@ -47,7 +47,7 @@
                 <label for="poster">Poster Image</label>
                 {% if comic.poster_url %}
                 <div class="poster-preview">
-                    <img src="/data/{{ comic.poster_url }}" alt="Current poster" class="preview-img">
+                    <img src="{{ image_url(comic.poster_url) }}" alt="Current poster" class="preview-img">
                     <small>Current poster — upload a new file to replace</small>
                 </div>
                 {% endif %}

@@ -11,13 +11,27 @@ DATA_ROOT = os.path.join(PROJECT_ROOT, "Data")
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif", "jfif"}
 
-# Cloudinary Configuration
-CLOUDINARY_URL = os.environ.get("CLOUDINARY_URL")
-if CLOUDINARY_URL:
-    cloudinary.config(cloudinary_url=CLOUDINARY_URL)
+# Cloudinary Configuration (Using separate variables to avoid auto-config errors)
+CLOUD_NAME = os.environ.get("CLOUDINARY_CLOUD_NAME")
+API_KEY = os.environ.get("CLOUDINARY_API_KEY")
+API_SECRET = os.environ.get("CLOUDINARY_API_SECRET")
+
+if CLOUD_NAME and API_KEY and API_SECRET:
+    cloudinary.config(
+        cloud_name=CLOUD_NAME,
+        api_key=API_KEY,
+        api_secret=API_SECRET,
+        secure=True
+    )
     IS_CLOUDINARY = True
 else:
-    IS_CLOUDINARY = False
+    # Also support the single URL if provided correctly
+    CL_URL = os.environ.get("CLOUDINARY_URL")
+    if CL_URL and CL_URL.startswith("cloudinary://"):
+        cloudinary.config(cloudinary_url=CL_URL)
+        IS_CLOUDINARY = True
+    else:
+        IS_CLOUDINARY = False
 
 
 def allowed_file(filename):

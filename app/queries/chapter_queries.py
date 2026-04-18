@@ -46,6 +46,7 @@ def get_chapter_by_number(conn, comic_id, chapter_number):
         return cur.fetchone()
 
 
+#chater_quries part two
 def delete_chapter(conn, chapter_id):
     """Delete a chapter and its cascaded pages."""
     with conn.cursor() as cur:

@@ -1,0 +1,429 @@
+================================================================
+        COMIC BOOK READING PLATFORM
+        Project Documentation
+================================================================
+
+
+================================================================
+1. TITLE NAME
+================================================================
+
+Project Title : Comic Book Reading Platform
+
+Member One  : Anuj Rakesh Rajput
+Member Two  : Sahil Dinkar Katurde
+Member One Roll No  : SY_CS_5
+Member Two Roll No  : Sy_CS_93
+Class         : Sybsc(CS)
+Institute     : Pune Vidyarthi Griha's College of Science & Commerce
+Academic Year : 2025-2026
+
+Guide         : Priyanka Khutwad ma'am
+Department    : Computer Science
+
+----------------------------------------------------------------
+Brief Description:
+The Comic Book Reading Platform is a web-based application that
+allows publishers to upload and manage comic books, and readers
+to browse and read them online. The system supports three roles:
+Admin, Publisher, and Reader.
+----------------------------------------------------------------
+
+
+================================================================
+2. PROBLEM DEFINITION
+================================================================
+
+Problem Statement:
+There is no simple, dedicated platform where small comic
+publishers can directly publish their work and readers can read
+it online without relying on third-party marketplaces.
+
+Existing Problems:
+- Publishers have no easy way to upload chapter-wise comics.
+- Readers cannot track their reading progress.
+- No role-based access for admin, publisher, and reader.
+- No clean reading interface for comic pages.
+
+Objective:
+To build a lightweight web platform where:
+- Publishers can register, upload comics and chapters.
+- Readers can browse, read comics, and track their progress.
+- Admin can manage and monitor all users and content.
+
+Scope:
+- Role-based login system (Admin / Publisher / Reader).
+- Comic upload with chapter and page management.
+- Reading progress tracking per reader per chapter.
+- Admin dashboard for user and content oversight.
+
+
+================================================================
+3. REQUIREMENT SPECIFICATION
+================================================================
+
+--- Hardware Requirements ---
+- Processor  : Intel Core i3 or above
+- RAM        : Minimum 4 GB
+- Storage    : Minimum 10 GB free disk space
+- Network    : Internet connection required
+
+--- Software Requirements ---
+- OS         : Windows 10 / Ubuntu 20.04 or above
+- Language   : Python 3.12
+- Framework  : Flask (Python Web Framework)
+- Database   : PostgreSQL
+- Frontend   : HTML, CSS, JavaScript
+- Tools      : VS Code, pgAdmin / psql, Git
+
+--- Functional Requirements ---
+1. User registration and login with role selection.
+2. Publisher can create, edit, and delete comics.
+3. Publisher can upload chapters and pages per chapter.
+4. Reader can browse published comics by genre.
+5. Reader can read comics page by page (full-screen mode).
+6. Reading progress is saved automatically.
+7. Admin can view all users, comics, and manage platform.
+
+--- Non-Functional Requirements ---
+1. Fast page load for comic images.
+2. Responsive UI for desktop browsers.
+3. Data consistency using PostgreSQL foreign keys.
+
+
+================================================================
+4. PROPOSED SYSTEM
+================================================================
+
+Overview:
+The proposed system is a Flask-based multi-role web application
+connected to a PostgreSQL database. It follows MVC architecture.
+
+System Modules:
+
+[A] Authentication Module
+    - Register as Admin, Publisher, or Reader.
+    - Login with email and password.
+    - Role-based redirect after login.
+
+[B] Admin Module
+    - View all registered publishers and readers.
+    - View all comics on the platform.
+    - Manage platform content.
+
+[C] Publisher Module
+    - Dashboard to manage own comics.
+    - Create new comic (title, genre, description, poster).
+    - Add chapters to a comic.
+    - Upload pages (images) per chapter.
+    - Edit or delete comics.
+
+[D] Reader Module
+    - Browse all published comics.
+    - View comic details and chapters.
+    - Read comics in full-screen reader mode.
+    - Progress is saved per chapter automatically.
+
+Technology Stack:
+- Backend  : Python + Flask
+- Database : PostgreSQL (psycopg2 driver)
+- Frontend : HTML + CSS + Vanilla JavaScript
+- Storage  : Local file system for comic images
+- Auth     : Session-based login
+
+
+================================================================
+5. ER DIAGRAM
+================================================================
+
+[Attach ER Diagram here]
+
+Entities and their relationships:
+
+- admin         : Manages the platform.
+- publisher     : Uploads and manages comics.
+- reader        : Reads comics, progress is tracked.
+- comic         : Belongs to a publisher. Has many chapters.
+- chapter       : Belongs to a comic. Has many pages.
+- page          : Belongs to a chapter. Stores image URL.
+- reading_progress : Links reader and chapter. Tracks last page.
+
+Key Relationships:
+- publisher --< comic       (One publisher, many comics)
+- comic     --< chapter     (One comic, many chapters)
+- chapter   --< page        (One chapter, many pages)
+- reader    --< reading_progress >-- chapter  (Many-to-many via progress)
+
+
+================================================================
+6. DATABASE DESIGN (Tables and Relationships in 3NF)
+================================================================
+
+All tables are in Third Normal Form (3NF):
+- No repeating groups (1NF).
+- All non-key attributes depend on the whole primary key (2NF).
+- No transitive dependencies (3NF).
+
+--- Table: admin ---
+Column      | Type        | Constraints
+------------|-------------|------------------------------
+id          | BIGINT      | PRIMARY KEY, AUTO-GENERATED
+name        | VARCHAR(100)| NOT NULL
+email       | VARCHAR(150)| NOT NULL, UNIQUE
+password    | TEXT        | NOT NULL
+created_at  | TIMESTAMP   | DEFAULT CURRENT_TIMESTAMP
+
+--- Table: publisher ---
+Column      | Type        | Constraints
+------------|-------------|------------------------------
+id          | BIGINT      | PRIMARY KEY, AUTO-GENERATED
+name        | VARCHAR(100)| NOT NULL
+email       | VARCHAR(150)| NOT NULL, UNIQUE
+password    | TEXT        | NOT NULL
+logo_url    | TEXT        | OPTIONAL
+created_at  | TIMESTAMP   | DEFAULT CURRENT_TIMESTAMP
+
+--- Table: reader ---
+Column      | Type        | Constraints
+------------|-------------|------------------------------
+id          | BIGINT      | PRIMARY KEY, AUTO-GENERATED
+name        | VARCHAR(100)| NOT NULL
+email       | VARCHAR(150)| NOT NULL, UNIQUE
+password    | TEXT        | NOT NULL
+created_at  | TIMESTAMP   | DEFAULT CURRENT_TIMESTAMP
+
+--- Table: comic ---
+Column        | Type          | Constraints
+--------------|---------------|------------------------------
+id            | BIGINT        | PRIMARY KEY, AUTO-GENERATED
+publisher_id  | BIGINT        | FOREIGN KEY -> publisher(id)
+title         | TEXT          | NOT NULL
+description   | TEXT          | OPTIONAL
+genre         | VARCHAR(80)   | OPTIONAL
+poster_url    | TEXT          | OPTIONAL
+status        | ENUM          | 'draft' or 'published'
+created_at    | TIMESTAMP     | DEFAULT CURRENT_TIMESTAMP
+
+--- Table: chapter ---
+Column          | Type      | Constraints
+----------------|-----------|------------------------------
+id              | BIGINT    | PRIMARY KEY, AUTO-GENERATED
+comic_id        | BIGINT    | FOREIGN KEY -> comic(id)
+chapter_number  | INT       | NOT NULL
+title           | TEXT      | OPTIONAL
+published_at    | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP
+UNIQUE: (comic_id, chapter_number)
+
+--- Table: page ---
+Column          | Type  | Constraints
+----------------|-------|------------------------------
+id              | BIGINT| PRIMARY KEY, AUTO-GENERATED
+chapter_id      | BIGINT| FOREIGN KEY -> chapter(id)
+page_number     | INT   | NOT NULL
+image_url       | TEXT  | NOT NULL
+UNIQUE: (chapter_id, page_number)
+
+--- Table: reading_progress ---
+Column      | Type    | Constraints
+------------|---------|------------------------------
+id          | BIGINT  | PRIMARY KEY, AUTO-GENERATED
+reader_id   | BIGINT  | FOREIGN KEY -> reader(id)
+chapter_id  | BIGINT  | FOREIGN KEY -> chapter(id)
+last_page   | INT     | DEFAULT 1
+completed   | BOOLEAN | DEFAULT FALSE
+updated_at  | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP
+UNIQUE: (reader_id, chapter_id)
+
+
+================================================================
+7. INPUT AND OUTPUT SCREEN LAYOUT (Visual Index Sequence)
+================================================================
+
+To perfectly map the project outputs visually, below is the formal 
+index of HTML screens mapped exactly to their `.png` printout files.
+
+[Authentication & Initial Routing]
+ 1. Login Frame         : app/screenshot/login.png
+ 2. Registration Module : app/screenshot/register.png
+
+[Reader End-User Output]
+ 3. Reader Dashboard    : app/screenshot/reader_home.png
+ 4. Comic Information   : app/screenshot/reader_read_chapter_id.png
+ 5. Chapter Reader      : app/screenshot/reader_read_chapter_id_.png
+
+[Publisher & Admin Deck]
+ 6. Publisher Dashboard : app/screenshot/publisher_home.png
+ 7. Comic Page Editor   : app/screenshot/edit_comic.png
+ 8. Admin Main Panel    : app/screenshot/admin_home.png
+
+
+================================================================
+8. CODING AND IMPLEMENTATION (Source Structure)
+================================================================
+
+The backend mechanics of the framework have been heavily mapped and sequenced. 
+Below is the printout structure of the Python API, database configurations, and UI logic.
+
+[Database Schemas & API Configuration]
+ 1. app/screenshot/programs/db.png
+ 2. app/screenshot/programs/sql_part_1.png
+ 3. app/screenshot/programs/sql_part_2.png
+
+[Server Initialization Entry Point]
+ 4. app/screenshot/programs/run_1.png
+ 5. app/screenshot/programs/run_2.png
+
+[Flask Blueprint Routing Layer]
+ 6. app/screenshot/programs/auth_routes_1.png
+ 7. app/screenshot/programs/auth_routes_2.png
+ 8. app/screenshot/programs/comic_routes_1.png
+ 9. app/screenshot/programs/comic_routes_2.png
+10. app/screenshot/programs/comic_routes_3.png
+11. app/screenshot/programs/comic_routes_4.png
+12. app/screenshot/programs/comic_routes_5.png
+13. app/screenshot/programs/comic_routes_6.png
+14. app/screenshot/programs/comic_routes_7.png
+15. app/screenshot/programs/comic_routes_8.png
+16. app/screenshot/programs/admin_routes.png
+17. app/screenshot/programs/admin_routes_1.png
+18. app/screenshot/programs/admin_routes_2.png
+
+[PostgreSQL Execution Logic]
+19. app/screenshot/programs/auth_service.png
+20. app/screenshot/programs/auth_quries.png
+21. app/screenshot/programs/comic_quires_1.png
+22. app/screenshot/programs/comic_quries_2.png
+23. app/screenshot/programs/chapter_queries_1.png
+24. app/screenshot/programs/chapter_quires_part_2.png
+25. app/screenshot/programs/admin_quries.png
+
+[Frontend Display Engine Integrations]
+26. app/screenshot/html/login_html.png
+27. app/screenshot/html/register_html.png
+28. app/screenshot/html/reader_home_html.png
+29. app/screenshot/html/reader_comic_html_part_one.png
+30. app/screenshot/html/reader_comic_html_part_two.png
+31. app/screenshot/html/reader_comic_html_part_three.png
+32. app/screenshot/html/reader_comic_part_four.png
+33. app/screenshot/html/reader_comic_html_part_five.png
+34. app/screenshot/html/publisher_home_html_part_one.png
+35. app/screenshot/html/publisher_home_part_two.png
+36. app/screenshot/html/publisher_chapter_html_one.png
+37. app/screenshot/html/publisher_chapter_html_two.png
+38. app/screenshot/html/publisher_edit_html.png
+39. app/screenshot/html/admin_home_html_one.png
+40. app/screenshot/html/admin_home_html_part_two.png
+41. app/screenshot/html/admin_home_html_part_three.png
+
+
+================================================================
+9. REPORT DESIGN
+================================================================
+
+System Flow:
+User visits site --> Login / Register --> Role detected
+   |
+   |--> Admin   : View dashboard, manage users and comics
+   |
+   |--> Publisher: Add comics, upload chapters and pages
+   |
+   |--> Reader  : Browse comics, read chapters, progress saved
+
+Data Flow:
+- Publisher uploads comic --> stored in 'comic' table.
+- Publisher adds chapter --> stored in 'chapter' table.
+- Publisher uploads pages --> stored in 'page' table.
+- Reader reads a chapter --> 'reading_progress' is updated.
+
+Security Design:
+- Passwords stored as hashed values (not plain text).
+- Session-based authentication for all routes.
+- Role-based access: each role can only see its own pages.
+
+File Storage:
+- Comic poster and page images stored in:
+  app/static/uploads/
+
+
+================================================================
+10. CONCLUSION
+================================================================
+
+The Comic Book Reading Platform successfully provides a complete
+end-to-end solution for digital comic publishing and reading.
+
+Key achievements:
+- Built a multi-role system: Admin, Publisher, Reader.
+- Publishers can easily upload and manage comic content.
+- Readers can browse, read, and track their progress.
+- Full-screen distraction-free reading mode implemented.
+- Secure login with role-based access control.
+- Clean and normalized PostgreSQL database design.
+
+The project demonstrates practical use of Flask, PostgreSQL,
+and HTML/CSS/JS to build a real-world web application.
+
+
+================================================================
+11. FUTURE ENHANCEMENT
+================================================================
+
+The following features can be added in future versions:
+
+1. Search and Filter  : Allow readers to search comics by title
+                        or filter by genre.
+
+2. Bookmarking        : Readers can bookmark favourite comics.
+
+3. Ratings & Reviews  : Readers can rate and review comics.
+
+4. Mobile App         : Convert platform to a mobile-friendly
+                        Progressive Web App (PWA).
+
+5. Subscription Model : Paid access to premium comics.
+
+6. Comment Section    : Readers can comment on chapters.
+
+7. Cloud Storage      : Move image storage to AWS S3 or
+                        Cloudinary for scalability.
+
+8. Email Notification : Notify readers when new chapters are
+                        published.
+
+9. Analytics Dashboard: Show publishers view counts and reader
+                        engagement stats.
+
+10. Dark Mode UI      : Full dark theme for comfortable reading.
+
+
+================================================================
+12. BIBLIOGRAPHY
+================================================================
+
+[1] Flask Documentation
+    https://flask.palletsprojects.com/
+
+[2] PostgreSQL Documentation
+    https://www.postgresql.org/docs/
+
+[3] psycopg2 Driver Documentation
+    https://www.psycopg.org/docs/
+
+[4] Python Official Documentation
+    https://docs.python.org/3/
+
+[5] HTML5 & CSS3 Reference
+    https://developer.mozilla.org/en-US/docs/Web
+
+[6] Git Documentation
+    https://git-scm.com/doc
+
+[7] Python Web Development with Flask
+    O'Reilly Media
+
+[8] Database System Concepts - Abraham Silberschatz
+    McGraw-Hill Education
+
+================================================================
+                      END OF DOCUMENTATION
+================================================================

@@ -2,6 +2,8 @@ import os
 import sys
 import time
 
+#run.py
+
 # Add the parent directory of "app" to sys.path so we can import "app" as a package
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
@@ -10,6 +12,8 @@ if parent_dir not in sys.path:
 
 from app import create_app
 from app.db import get_db
+
+from dotenv import load_dotenv, find_dotenv
 
 def print_banner():
     banner = """
@@ -44,6 +48,10 @@ def check_db():
 
 def seed_admin():
     print("Ensuring default admin exists...")
+    admin_email = os.getenv("ADMIN_EMAIL", "admin@example.com")
+    admin_password = os.getenv("ADMIN_PASSWORD", "adminpass")
+    
+    conn = None
     try:
         conn = get_db()
         with conn.cursor() as cur:
@@ -52,24 +60,26 @@ def seed_admin():
             if not cur.fetchone():
                 cur.execute("""
                     INSERT INTO admin (name, email, password)
-                    VALUES ('Admin User', 'admin@example.com', 'adminpass');
-                """)
-                print("[INFO] Default admin created: admin@example.com / adminpass")
+                    VALUES ('Admin User', %s, %s);
+                """, (admin_email, admin_password))
+                print(f"[INFO] Default admin created: {admin_email}")
             else:
                 # Ensure the default one is updated/exists
                 cur.execute("""
                     UPDATE admin 
-                    SET email = 'admin@example.com', password = 'adminpass'
-                    WHERE email = 'admin@example.com' OR id = (SELECT id FROM admin LIMIT 1);
-                """)
+                    SET email = %s, password = %s
+                    WHERE email = %s OR id = (SELECT id FROM admin LIMIT 1);
+                """, (admin_email, admin_password, admin_email))
                 print("[OK] Admin account verified.")
             conn.commit()
     except Exception as e:
         print(f"[ERR] Failed to seed admin: {e}")
     finally:
-        conn.close()
+        if conn:
+            conn.close()
 
 def main():
+    load_dotenv(find_dotenv())
     print_banner()
     check_dependencies()
     check_db()

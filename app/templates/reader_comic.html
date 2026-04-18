@@ -85,76 +85,123 @@
     </div>
 </div>
 
-    <!-- Focused Reader Overlay (Lightbox) -->
+    <!-- ============================================
+         FOCUSED READING MODE (Lightbox Overlay)
+         ============================================ -->
     <div id="focused-reader">
+        <!-- Invisible tap zones for navigation (left = prev, right = next) -->
+        <div class="lightbox-tap-zone lightbox-tap-prev" id="tap-prev"></div>
+        <div class="lightbox-tap-zone lightbox-tap-next" id="tap-next"></div>
+
+        <!-- Image container -->
         <div class="lightbox-container">
-            <div class="lightbox-close" onclick="closeLightbox()">CLOSE X</div>
-            <img id="lightbox-img" class="lightbox-image" src="" alt="Focused Page">
-            
-            <div class="lightbox-nav">
-                <button class="lightbox-btn" onclick="prevPage()">&larr;</button>
-                <button class="lightbox-btn" onclick="nextPage()">&rarr;</button>
-            </div>
+            <img id="lightbox-img" class="lightbox-image" src="" alt="Focused Page" draggable="false">
         </div>
     </div>
 
     <script>
+        // ─── PAGE DATA ──────────────────────────────────────────
         const pages = [
             {% for page in pages %}
             "/data/{{ page.image_url }}",
             {% endfor %}
         ];
-        
-        let currentIndex = 0;
-        const overlay = document.getElementById('focused-reader');
-        const lightboxImg = document.getElementById('lightbox-img');
 
+        let currentIndex = 0;
+        let isOpen = false;
+
+        // ─── DOM REFS ───────────────────────────────────────────
+        const overlay      = document.getElementById('focused-reader');
+        const lightboxImg  = document.getElementById('lightbox-img');
+        const tapPrev      = document.getElementById('tap-prev');
+        const tapNext      = document.getElementById('tap-next');
+
+        // ─── OPEN / CLOSE ───────────────────────────────────────
         function openLightbox(index) {
             currentIndex = index;
-            updateLightboxContent();
+            lightboxImg.src = pages[currentIndex];
             overlay.style.display = 'flex';
-            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            document.body.style.overflow = 'hidden';
+            isOpen = true;
         }
 
         function closeLightbox() {
             overlay.style.display = 'none';
             document.body.style.overflow = 'auto';
+            isOpen = false;
         }
 
-        function updateLightboxContent() {
-            lightboxImg.src = pages[currentIndex];
+        // ─── PAGE NAVIGATION ────────────────────────────────────
+        function goToPage(index) {
+            if (index < 0 || index >= pages.length) return;
+            currentIndex = index;
+
+            // Fade-out → swap image → fade-in
+            lightboxImg.classList.add('fade-out');
+            setTimeout(() => {
+                lightboxImg.src = pages[currentIndex];
+                lightboxImg.classList.remove('fade-out');
+            }, 200);
         }
 
         function nextPage() {
             if (currentIndex < pages.length - 1) {
-                currentIndex++;
-                updateLightboxContent();
-            } else {
-                // If at the end, close the lightbox
-                closeLightbox();
+                goToPage(currentIndex + 1);
             }
         }
 
         function prevPage() {
             if (currentIndex > 0) {
-                currentIndex--;
-                updateLightboxContent();
+                goToPage(currentIndex - 1);
             }
         }
 
-        // Close on escape key
-        document.addEventListener('keydown', (e) => {
-            if (overlay.style.display === 'flex') {
-                if (e.key === 'Escape') closeLightbox();
-                if (e.key === 'ArrowRight') nextPage();
-                if (e.key === 'ArrowLeft') prevPage();
-            }
-        });
+        // ─── EVENT LISTENERS ────────────────────────────────────
 
-        // Close on clicking the background
+        // Tap zones
+        tapPrev.addEventListener('click', (e) => { e.stopPropagation(); prevPage(); });
+        tapNext.addEventListener('click', (e) => { e.stopPropagation(); nextPage(); });
+
+        // Click background to close (alternative to Ctrl+X)
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) closeLightbox();
         });
+
+        // Keyboard navigation & Close Shortcut
+        document.addEventListener('keydown', (e) => {
+            if (!isOpen) return;
+
+            // Ctrl + X to close
+            if (e.ctrlKey && e.key.toLowerCase() === 'x') {
+                e.preventDefault();
+                closeLightbox();
+                return;
+            }
+
+            switch (e.key) {
+                case 'ArrowRight': nextPage();      break;
+                case 'ArrowLeft':  prevPage();      break;
+            }
+        });
+
+        // ─── TOUCH / SWIPE SUPPORT ──────────────────────────────
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        overlay.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        }, { passive: true });
+
+        overlay.addEventListener('touchend', (e) => {
+            const dx = e.changedTouches[0].screenX - touchStartX;
+            const dy = e.changedTouches[0].screenY - touchStartY;
+
+            if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+                if (dx < 0) nextPage();
+                else        prevPage();
+            }
+        }, { passive: true });
     </script>
 </body>
 </html>

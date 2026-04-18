@@ -99,7 +99,7 @@ def read_comic_entry(comic_id):
     finally:
         conn.close()
 
-
+#3
 @comic_bp.route("/read/<int:comic_id>/<int:chapter_number>")
 @login_required
 @role_required("reader")
@@ -155,6 +155,7 @@ def publisher_home():
         conn.close()
 
 
+#FOUR ___
 # --- Create Comic (with poster upload) ---
 
 @comic_bp.route("/publisher/create", methods=["POST"])
@@ -210,7 +211,7 @@ def publisher_edit_form(comic_id):
     finally:
         conn.close()
 
-
+#FIVE
 # --- Update Comic (with optional poster re-upload) ---
 
 @comic_bp.route("/publisher/edit/<int:comic_id>", methods=["POST"])
@@ -247,7 +248,7 @@ def publisher_update_comic(comic_id):
     finally:
         conn.close()
 
-
+#six
 # --- Delete Comic (with cascade folder cleanup) ---
 
 @comic_bp.route("/publisher/delete/<int:comic_id>", methods=["POST"])
@@ -298,7 +299,7 @@ def publisher_chapters(comic_id):
     finally:
         conn.close()
 
-
+#SEVEN
 @comic_bp.route("/publisher/comic/<int:comic_id>/chapter/create", methods=["POST"])
 @login_required
 @role_required("publisher")
@@ -346,7 +347,7 @@ def publisher_upload_pages(comic_id, chapter_num):
         conn.close()
     return redirect(f"/publisher/comic/{comic_id}/chapters")
 
-
+#eight
 @comic_bp.route("/publisher/chapter/<int:chapter_id>/delete", methods=["POST"])
 @login_required
 @role_required("publisher")

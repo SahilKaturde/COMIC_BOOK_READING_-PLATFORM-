@@ -39,7 +39,7 @@ def create_comic(conn, publisher_id, title, description, genre, poster_url=None)
         """, (publisher_id, title, description, genre, poster_url))
         return cur.fetchone()
 
-
+#comic quries part two
 def update_comic(conn, comic_id, title, description, genre, poster_url=None, status=None):
     """Update an existing comic. (Ownership check removed as requested)"""
     with conn.cursor() as cur:

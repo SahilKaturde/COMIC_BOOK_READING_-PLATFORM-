@@ -1,17 +1,21 @@
-# app/__init__.py
-
 from flask import Flask, send_from_directory, redirect, session
 from app.routes.auth_routes import auth_bp
 from app.routes.comic_routes import comic_bp
 from app.routes.admin_routes import admin_bp
 import os
+from dotenv import load_dotenv, find_dotenv
 
+# Load environment variables
+load_dotenv(find_dotenv())
+
+# Define the absolute path to your Data folder
 DATA_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "Data")
-
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'dev_key'  # Replace with actual secret key in production
+    
+    # App configuration
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_key')
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
 
     # Register blueprints
@@ -24,7 +28,7 @@ def create_app():
     def serve_data(filename):
         return send_from_directory(DATA_ROOT, filename)
 
-    # Fast Flow Index: Redirect to dashboard if logged in
+    # Fast Flow Index: Redirect to dashboard based on role
     @app.route("/")
     def index():
         if "user_id" in session:
@@ -35,6 +39,7 @@ def create_app():
                 return redirect("/publisher_home")
             elif role == "admin":
                 return redirect("/admin_home")
+        
         return redirect("/login")
 
     return app

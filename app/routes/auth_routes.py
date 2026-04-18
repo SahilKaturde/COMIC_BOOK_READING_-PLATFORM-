@@ -52,7 +52,7 @@ def register():
                 conn.commit()
 
         return redirect("/login")
-
+#Auth routes part two
     except Exception as e:
         conn.rollback()
         return render_template("register.html", error=str(e))

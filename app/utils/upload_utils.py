@@ -2,6 +2,14 @@
 
 import os
 import shutil
+
+# --- SAFETY SHIELD ---
+# The Cloudinary SDK crashes on import if CLOUDINARY_URL exists but is invalid.
+# We MUST sanitize the environment BEFORE importing it.
+cl_url = os.environ.get("CLOUDINARY_URL")
+if cl_url and not cl_url.startswith("cloudinary://"):
+    os.environ.pop("CLOUDINARY_URL")
+
 import cloudinary
 import cloudinary.uploader
 

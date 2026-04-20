@@ -15,7 +15,7 @@
     <header class="dashboard-header">
         <div class="header-left">
             {% if user_logo %}
-            <img src="/data/{{ user_logo }}" alt="{{ user_name }} logo" class="publisher-logo-small">
+            <img src="{{ image_url(user_logo) }}" alt="{{ user_name }} logo" class="publisher-logo-small">
             {% endif %}
             <h1>CBRP</h1>
         </div>
@@ -64,7 +64,7 @@
         <div class="comic-card">
             <div class="comic-poster">
                 {% if comic.poster_url %}
-                <img src="/data/{{ comic.poster_url }}" alt="{{ comic.title }} Poster">
+                <img src="{{ image_url(comic.poster_url) }}" alt="{{ comic.title }} Poster">
                 {% else %}
                 <div class="comic-poster-fallback">CBRP</div>
                 {% endif %}

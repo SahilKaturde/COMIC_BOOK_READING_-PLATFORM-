@@ -7,6 +7,10 @@ from psycopg.rows import dict_row
 load_dotenv(find_dotenv())
 
 def get_db():
+    db_url = os.environ.get("DATABASE_URL")
+    if db_url:
+        return psycopg.connect(db_url, row_factory=dict_row)
+        
     return psycopg.connect(
         dbname=os.environ.get("DB_NAME", "Comic_Book_Reading_Platform_db"),
         user=os.environ.get("DB_USER", "postgres"),
@@ -20,8 +24,8 @@ def get_db():
 if __name__ == "__main__":
     try:
         conn = get_db()
-        print("✅ Database connected successfully!")
+        print("[OK] Database connected successfully!")
 
         conn.close()
     except Exception as e:
-        print("❌ Connection failed:", e)
+        print("[ERROR] Connection failed:", e)

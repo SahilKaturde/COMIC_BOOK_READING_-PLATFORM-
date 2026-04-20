@@ -44,7 +44,7 @@
     <div class="reader-pages">
         {% for page in pages %}
         <div class="reader-page">
-            <img src="/data/{{ page.image_url }}" 
+            <img src="{{ image_url(page.image_url) }}" 
                  alt="Page {{ page.page_number }}" 
                  loading="lazy"
                  class="clickable-page"
@@ -103,7 +103,7 @@
         // ─── PAGE DATA ──────────────────────────────────────────
         const pages = [
             {% for page in pages %}
-            "/data/{{ page.image_url }}",
+            "{{ image_url(page.image_url) }}",
             {% endfor %}
         ];
 
